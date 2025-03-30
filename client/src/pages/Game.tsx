@@ -1,14 +1,19 @@
+import { useParams } from "react-router";
 import Letter from "../components/Letter";
 
 import { ContextNavigationProvider } from "../contexts/ContextNavigation";
 
-export default function Game() {
+export default function Game({letters : propLetters}: {letters?: string}) {
+    const { letters: paramLetters } = useParams();
+    const letters = paramLetters || propLetters || '';
+    const letterElements = letters.toUpperCase().split('').map((letter, index) => (
+        <Letter key={index} id={index.toString()} value={letter} />
+    ));
+
     return (
         <ContextNavigationProvider>
             <main className="game">
-                <Letter id="1" value="A" />
-                <Letter id="2" value="B" />
-                <Letter id="3" value="C" />
+                {letterElements}
             </main>
         </ContextNavigationProvider>
     );
