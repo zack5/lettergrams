@@ -1,18 +1,34 @@
 // LetterContext.tsx
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useRef } from 'react';
 
-const ContextNavigation = createContext<{
-    registerDraggedLetter: (id: string) => void;
+export const ContextNavigation = createContext<{
+    registerDraggedLetter: (id: string, onDrag?: (e: MouseEvent) => void) => void;
     currentDraggedId: string | null;
 }>({ registerDraggedLetter: () => {}, currentDraggedId: null });
 
-export default function ContextNavigationProvider({ children }: { children: React.ReactNode }) {
+export function ContextNavigationProvider({ children }: { children: React.ReactNode }) {
     const [currentDraggedId, setCurrentDraggedId] = useState<string | null>(null);
+    const dragCallbackRef = useRef<((e: MouseEvent) => void) | null>(null);
+
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (currentDraggedId && dragCallbackRef.current) {
+                dragCallbackRef.current(e);
+            }
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, [currentDraggedId]);
+
+    const registerDraggedLetter = (id: string, onDrag?: (e: MouseEvent) => void) => {
+        setCurrentDraggedId(id);
+        dragCallbackRef.current = onDrag || null;
+    };
 
     useEffect(() => {
         const handleGlobalMouseUp = () => {
             if (currentDraggedId) {
-                // Handle drag end logic
                 setCurrentDraggedId(null);
             }
         };
@@ -23,7 +39,7 @@ export default function ContextNavigationProvider({ children }: { children: Reac
 
     return (
         <ContextNavigation.Provider value={{ 
-            registerDraggedLetter: setCurrentDraggedId,
+            registerDraggedLetter,
             currentDraggedId 
         }}>
             {children}
