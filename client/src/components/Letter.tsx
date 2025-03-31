@@ -22,10 +22,13 @@ export default function Letter({ id, value }: { id: string, value: string }) {
     
     return (
         <motion.div
-            className="letter not-selectable"
+            className={`letter not-selectable ${isDragging ? 'selected' : ''}`}
             style={{ 
                 width: GRID_SIZE, 
                 height: GRID_SIZE,
+                position: 'absolute',
+                top: 0,
+                left: 0,
             }}
             onMouseDown={() => registerDraggedLetter(id, (e) => {
                 setPosition(prev => ({ 

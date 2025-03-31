@@ -12,4 +12,10 @@
     font-weight: bold;
 
     border-radius: 0.5rem;
+    box-sizing: border-box;
+
+    &.selected {
+        border: 2px solid variables.$color-primary;
+        z-index: 1;
+    }
 }
