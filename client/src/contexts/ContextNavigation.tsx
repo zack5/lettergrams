@@ -1,13 +1,18 @@
 // LetterContext.tsx
 import { createContext, useState, useEffect, useRef } from 'react';
 
+import { LetterRuntime } from '../types/LetterRuntime';
+
 export const ContextNavigation = createContext<{
     registerDraggedLetter: (id: string, onDrag?: (e: MouseEvent) => void) => void;
     currentDraggedId: string | null;
-}>({ registerDraggedLetter: () => {}, currentDraggedId: null });
+    letterRuntimes: LetterRuntime[];
+    setLetterRuntimes: (letterRuntimes: LetterRuntime[] | ((prev: LetterRuntime[]) => LetterRuntime[])) => void;
+}>({ registerDraggedLetter: () => {}, currentDraggedId: null, letterRuntimes: [], setLetterRuntimes: () => {} });
 
 export function ContextNavigationProvider({ children }: { children: React.ReactNode }) {
     const [currentDraggedId, setCurrentDraggedId] = useState<string | null>(null);
+    const [letterRuntimes, setLetterRuntimes] = useState<LetterRuntime[]>([]);
     const dragCallbackRef = useRef<((e: MouseEvent) => void) | null>(null);
 
     useEffect(() => {
@@ -40,7 +45,9 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
     return (
         <ContextNavigation.Provider value={{ 
             registerDraggedLetter,
-            currentDraggedId 
+            currentDraggedId,
+            letterRuntimes,
+            setLetterRuntimes,
         }}>
             {children}
         </ContextNavigation.Provider>

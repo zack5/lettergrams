@@ -3,23 +3,56 @@ import { useState, useContext, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ContextNavigation } from "../contexts/ContextNavigation";
 
-export default function Letter({ id, value }: { id: string, value: string }) {
-    const [position, setPosition] = useState({ x: 0, y: 0 });
-
-    const { registerDraggedLetter, currentDraggedId } = useContext(ContextNavigation);
-
+export default function Letter({ id }: { id: string }) {
+    const [positionWhileDragging, setPositionWhileDragging] = useState({ x: 0, y: 0 });
+    
+    const { registerDraggedLetter, currentDraggedId, letterRuntimes, setLetterRuntimes } = useContext(ContextNavigation);
+    const runtime = letterRuntimes.find((letter) => letter.id === id);
+    const value = runtime?.letter || '';
+    
     const isDragging = currentDraggedId === id;
-
-    const snapToGrid = (value: number) => {
-        return Math.round(value / GRID_SIZE) * GRID_SIZE;
+    
+    const getPositionFromCoords = (row: number, col: number) => {
+        return {
+            x: col * GRID_SIZE,
+            y: row * GRID_SIZE,
+        };
     };
+
+    const positionFromCoordinates = getPositionFromCoords(runtime?.row || 0, runtime?.col || 0);
 
     useEffect(() => {
         if (!isDragging) {
-            setPosition({ x: snapToGrid(position.x), y: snapToGrid(position.y) });
+            setLetterRuntimes((prev) => {
+                const targetRow = Math.round(positionWhileDragging.y / GRID_SIZE);
+                const targetCol = Math.round(positionWhileDragging.x / GRID_SIZE);
+
+                const newLetterRuntimes = [...prev];
+
+                const index = newLetterRuntimes.findIndex((letter) => letter.id === id);
+                if (index !== -1) {
+
+                    // Swap with existing letter
+                    const existingLetterIndex = prev.findIndex((letter) => letter.row === targetRow && letter.col === targetCol);
+                    if (existingLetterIndex !== -1) {
+                        newLetterRuntimes[existingLetterIndex] = {
+                            ...newLetterRuntimes[existingLetterIndex],
+                            row: runtime?.row || 0,
+                            col: runtime?.col || 0,
+                        };
+                    }
+
+                    newLetterRuntimes[index] = {
+                        ...newLetterRuntimes[index],
+                        row: targetRow,
+                        col: targetCol,
+                    };
+                }
+                return newLetterRuntimes;
+            });
         }
     }, [isDragging]);
-    
+
     return (
         <motion.div
             className={`letter not-selectable ${isDragging ? 'selected' : ''}`}
@@ -30,13 +63,19 @@ export default function Letter({ id, value }: { id: string, value: string }) {
                 top: 0,
                 left: 0,
             }}
-            onMouseDown={() => registerDraggedLetter(id, (e) => {
-                setPosition(prev => ({ 
-                    x: prev.x + e.movementX, 
-                    y: prev.y + e.movementY 
-                }));
-            })}
-            animate={{ transform: `translate(${position.x}px, ${position.y}px)` }}
+            onMouseDown={() => {
+                setPositionWhileDragging(positionFromCoordinates);
+                registerDraggedLetter(id, (e) => {
+                    setPositionWhileDragging(prev => ({ 
+                        x: prev.x + e.movementX, 
+                        y: prev.y + e.movementY 
+                    }));
+                });
+            }}
+            animate={isDragging 
+                ? { transform: `translate(${positionWhileDragging.x}px, ${positionWhileDragging.y}px)` }
+                : { transform: `translate(${positionFromCoordinates.x}px, ${positionFromCoordinates.y}px)` }
+            }
             transition={{ type: "spring", duration: isDragging ? 0 : 0.4 }}
         >
             {value}
