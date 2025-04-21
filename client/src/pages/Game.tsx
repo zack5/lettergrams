@@ -1,6 +1,7 @@
 import { useParams } from "react-router";
-import { use, useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 
+import Board from "../components/Board";
 import Letter from "../components/Letter";
 
 import { ContextNavigation } from "../contexts/ContextNavigation";
@@ -28,6 +29,7 @@ export default function Game({letters : propLetters}: {letters?: string}) {
 
     return (
         <main className="game">
+            <Board />
             {letterElements}
         </main>
     );

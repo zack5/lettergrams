@@ -1,0 +1,7 @@
+@use "../base/variables";
+
+.board {
+    background-color: variables.$color-background;
+    width: 100%;
+    height: 100%;
+}

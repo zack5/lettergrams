@@ -1,5 +1,7 @@
 @use "./base/variables";
 
+@use "./components/board";
+@use "./components/drag_bounds";
 @use "./components/letter";
 
 @use "./pages/game";

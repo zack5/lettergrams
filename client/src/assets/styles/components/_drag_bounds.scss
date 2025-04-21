@@ -1,0 +1,7 @@
+@use "../base/variables";
+
+.drag-bounds {
+    background-color: rgba(variables.$color-primary, 0.15);
+    border: 1px solid variables.$color-primary;
+    z-index: 10;
+}
