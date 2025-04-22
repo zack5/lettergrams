@@ -96,12 +96,14 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                         const index = newLetterRuntimes.findIndex(letter => letter.row === targetRow && letter.col === targetCol);
                         if (index !== -1) {
                             const existingLetter = newLetterRuntimes[index];
-                            newLetterRuntimes[index] = {
-                                ...existingLetter,
-                                row: runtime.row,
-                                col: runtime.col,
-                                positionWhileDragging: getPositionFromCoords(runtime.row, runtime.col),
-                            };
+                            if (!selectedLetterIds.includes(existingLetter.id)) {
+                                newLetterRuntimes[index] = {
+                                    ...existingLetter,
+                                    row: runtime.row,
+                                    col: runtime.col,
+                                    positionWhileDragging: getPositionFromCoords(runtime.row, runtime.col),
+                                };
+                            }
                         }
                         
                         newLetterRuntimes[runtimeIndex] = updatedRuntime;
