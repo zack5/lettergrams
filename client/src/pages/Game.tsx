@@ -6,6 +6,7 @@ import Letter from "../components/Letter";
 
 import { ContextNavigation } from "../contexts/ContextNavigation";
 import { LetterRuntime } from "../types/LetterRuntime";
+import { getPositionFromCoords } from "../utils/Utils";
 
 export default function Game({letters : propLetters}: {letters?: string}) {
     const { letters: paramLetters } = useParams();
@@ -19,6 +20,7 @@ export default function Game({letters : propLetters}: {letters?: string}) {
             row: 0,
             col: index,
             letter: letter,
+            positionWhileDragging: getPositionFromCoords(0, index),
         }));
         setLetterRuntimes(letterRuntimes);
     }, [letters]);

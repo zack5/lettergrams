@@ -3,4 +3,5 @@ export interface LetterRuntime {
     row: number;
     col: number;
     letter: string;
+    positionWhileDragging: { x: number; y: number };
 }
