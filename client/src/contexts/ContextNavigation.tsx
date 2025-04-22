@@ -105,7 +105,6 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                         }
                         
                         newLetterRuntimes[runtimeIndex] = updatedRuntime;
-                        console.log(targetCol, updatedRuntime)
                     }
                 });
 

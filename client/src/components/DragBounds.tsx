@@ -24,14 +24,18 @@ export default function DragBounds({ isDragging, startPosition, currentPosition 
         if (!isDragging) {
             return;
         }
+
+        const l1 = { x: left, y: top };
+        const r1 = { x: left + width, y: top + height };
+
         const selectedLetterIds = letterRuntimes.filter((letter) => {
-                const position = getPositionFromCoords(letter.row, letter.col);
-                const validX = (position.x >= left && position.x <= left + width)
-                    || (position.x + GRID_SIZE >= left && position.x + GRID_SIZE <= left + width);
-                const validY = (position.y >= top && position.y <= top + height)
-                    || (position.y + GRID_SIZE >= top && position.y + GRID_SIZE <= top + height);
-                return validX && validY;
-            }).map((runtime) => runtime.id);
+            const l2 = getPositionFromCoords(letter.row, letter.col);
+            const r2 = {x: l2.x + GRID_SIZE, y: l2.y + GRID_SIZE};
+
+            if (l1.x > r2.x || l2.x > r1.x) return false;
+            if (r1.y < l2.y || r2.y < l1.y) return false;
+            return true;
+        }).map((runtime) => runtime.id);
         setSelectedLetterIds(selectedLetterIds);
     }, [isDragging, currentPosition, startPosition, letterRuntimes, setSelectedLetterIds]);
 
