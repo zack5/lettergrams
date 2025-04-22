@@ -8,11 +8,21 @@ export const ContextNavigation = createContext<{
     currentDraggedId: string | null;
     letterRuntimes: LetterRuntime[];
     setLetterRuntimes: (letterRuntimes: LetterRuntime[] | ((prev: LetterRuntime[]) => LetterRuntime[])) => void;
-}>({ registerDraggedLetter: () => {}, currentDraggedId: null, letterRuntimes: [], setLetterRuntimes: () => {} });
+    selectedLetterIds: string[];
+    setSelectedLetterIds: (selectedLetterIds: string[] | ((prev: string[]) => string[])) => void;
+}>({
+    registerDraggedLetter: () => {},
+    currentDraggedId: null,
+    letterRuntimes: [],
+    setLetterRuntimes: () => {},
+    selectedLetterIds: [],
+    setSelectedLetterIds: () => {}
+});
 
 export function ContextNavigationProvider({ children }: { children: React.ReactNode }) {
     const [currentDraggedId, setCurrentDraggedId] = useState<string | null>(null);
     const [letterRuntimes, setLetterRuntimes] = useState<LetterRuntime[]>([]);
+    const [selectedLetterIds, setSelectedLetterIds] = useState<string[]>([]);
     const dragCallbackRef = useRef<((e: MouseEvent) => void) | null>(null);
 
     useEffect(() => {
@@ -48,6 +58,8 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
             currentDraggedId,
             letterRuntimes,
             setLetterRuntimes,
+            selectedLetterIds,
+            setSelectedLetterIds,
         }}>
             {children}
         </ContextNavigation.Provider>

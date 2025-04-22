@@ -2,23 +2,17 @@ import { GRID_SIZE } from "../constants/Constants";
 import { useState, useContext, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ContextNavigation } from "../contexts/ContextNavigation";
+import { getPositionFromCoords } from "../utils/Utils";
 
 export default function Letter({ id }: { id: string }) {
     const [positionWhileDragging, setPositionWhileDragging] = useState({ x: 0, y: 0 });
     
-    const { registerDraggedLetter, currentDraggedId, letterRuntimes, setLetterRuntimes } = useContext(ContextNavigation);
+    const { registerDraggedLetter, currentDraggedId, letterRuntimes, setLetterRuntimes, selectedLetterIds, setSelectedLetterIds } = useContext(ContextNavigation);
     const runtime = letterRuntimes.find((letter) => letter.id === id);
     const value = runtime?.letter || '';
     
     const isDragging = currentDraggedId === id;
     
-    const getPositionFromCoords = (row: number, col: number) => {
-        return {
-            x: col * GRID_SIZE,
-            y: row * GRID_SIZE,
-        };
-    };
-
     const positionFromCoordinates = getPositionFromCoords(runtime?.row || 0, runtime?.col || 0);
 
     useEffect(() => {
@@ -53,9 +47,11 @@ export default function Letter({ id }: { id: string }) {
         }
     }, [isDragging]);
 
+    const isSelected = isDragging || selectedLetterIds.includes(id);
+
     return (
         <motion.div
-            className={`letter not-selectable ${isDragging ? 'selected' : ''}`}
+            className={`letter not-selectable ${isSelected ? 'selected' : ''}`}
             style={{ 
                 width: GRID_SIZE, 
                 height: GRID_SIZE,
@@ -65,6 +61,9 @@ export default function Letter({ id }: { id: string }) {
             }}
             onMouseDown={() => {
                 setPositionWhileDragging(positionFromCoordinates);
+                if (!isSelected) {
+                    setSelectedLetterIds([id]);
+                }
                 registerDraggedLetter(id, (e) => {
                     setPositionWhileDragging(prev => ({ 
                         x: prev.x + e.movementX, 

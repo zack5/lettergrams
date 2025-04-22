@@ -4,12 +4,14 @@ import DragBounds from './DragBounds';
 
 export default function Board() {
     const [isDragging, setIsDragging] = useState(false);
-    const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
-    const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
+    const [startPosition, setStartPosition] = useState({ x: -1, y: -1 });
+    const [currentPosition, setCurrentPosition] = useState({ x: -1, y: -1 });
 
     useEffect(() => {
         const handleGlobalMouseUp = () => {
             setIsDragging(false);
+            setStartPosition({ x: -1, y: -1 });
+            setCurrentPosition({ x: -1, y: -1 });
         };
 
         window.addEventListener('mouseup', handleGlobalMouseUp);
@@ -26,8 +28,6 @@ export default function Board() {
         return () => window.removeEventListener('mousemove', handleGlobalMouseMove);
     }, [isDragging]);
 
-    console.log(currentPosition)
-    
     return (
         <div
             className="board"
@@ -37,7 +37,8 @@ export default function Board() {
                 setCurrentPosition({ x: e.clientX, y: e.clientY });
             }}
         >
-            {isDragging && <DragBounds
+            {<DragBounds
+                isDragging={isDragging}
                 startPosition={startPosition}
                 currentPosition={currentPosition}
             />}
