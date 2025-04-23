@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom'
 
 import { ContextNavigationProvider } from "./contexts/ContextNavigation";
 
@@ -12,7 +12,8 @@ export default function App() {
       <ContextNavigationProvider>
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Game letters="ABC" />} />
+              <Route path="/" element={<Navigate to="/play/LetterGrams" replace />} />
+              <Route path="/play/" element={<Navigate to="/play/LetterGrams" replace />} />
               <Route path="/play/:letters" element={<Game />} />
               <Route path="/about" element={<About />} />
               <Route path="*" element={<NotFound />} />

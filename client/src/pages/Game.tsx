@@ -2,7 +2,7 @@ import { useParams } from "react-router";
 import { useContext, useEffect } from "react";
 
 import Board from "../components/Board";
-import Letter from "../components/Letter";
+import GameLetter from "../components/GameLetter";
 
 import { ContextNavigation } from "../contexts/ContextNavigation";
 import { LetterRuntime } from "../types/LetterRuntime";
@@ -26,7 +26,7 @@ export default function Game({letters : propLetters}: {letters?: string}) {
     }, [letters]);
 
     const letterElements = letters.split('').map((_, index) => (
-        <Letter key={index} id={index.toString()} />
+        <GameLetter key={index} id={index.toString()} />
     ));
 
     return (

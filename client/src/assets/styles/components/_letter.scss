@@ -18,4 +18,8 @@
         border: 2px solid variables.$color-primary;
         z-index: 1;
     }
+
+    &.interactive {
+        cursor: pointer;
+    }
 }

@@ -1,3 +1,12 @@
+import DocumentPage from "../components/DocumentPage"
+import LetterHeader from "../components/LetterHeader"
+
 export default function NotFound() {
-    return <h2>Error: Page not found</h2>;
+    return (
+        <DocumentPage>
+            <LetterHeader text="Error"/>
+            <h2>Oops!</h2>
+            <p>Page not found.</p>
+        </DocumentPage>
+    );
 }
