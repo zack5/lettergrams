@@ -3,7 +3,7 @@ import { useContext, useEffect } from "react";
 import { ContextNavigation } from "../contexts/ContextNavigation";
 
 import { getPositionFromCoords } from "../utils/Utils";
-import { select } from "motion/react-client";
+
 import { GRID_SIZE } from "../constants/Constants";
 
 type DragBoundsProps = {

@@ -5,7 +5,6 @@ import { GRID_SIZE } from '../constants/Constants';
 import { LetterRuntime } from '../types/LetterRuntime';
 
 import { getPositionFromCoords } from '../utils/Utils';
-import { s } from 'motion/react-client';
 
 export const ContextNavigation = createContext<{
     isDraggingLetters: boolean;
@@ -27,20 +26,9 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
     const [isDraggingLetters, setIsDraggingLetters] = useState<boolean>(false);
     const [letterRuntimes, setLetterRuntimes] = useState<LetterRuntime[]>([]);
     const [selectedLetterIds, setSelectedLetterIds] = useState<string[]>([]);
-    const firstFrameDraggingRef = useRef<boolean>(true);
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
-            let recalculateStartingDragPosition = false;
-            if (isDraggingLetters) {
-                if (firstFrameDraggingRef.current) {
-                    firstFrameDraggingRef.current = false;
-                    recalculateStartingDragPosition = true;
-                }
-            } else {
-                firstFrameDraggingRef.current = true;
-            }
-
             if (isDraggingLetters) {
                 setLetterRuntimes(prev => {
                     const newLetterRuntimes = prev.map(runtime => {
