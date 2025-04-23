@@ -1,6 +1,7 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useRef } from 'react';
+import { isEqual } from 'lodash';
 
-import { GRID_SIZE } from '../constants/Constants';
+import { GRID_SIZE, UNDO_LIMIT } from '../constants/Constants';
 
 import { LetterRuntime } from '../types/LetterRuntime';
 
@@ -26,6 +27,43 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
     const [isDraggingLetters, setIsDraggingLetters] = useState<boolean>(false);
     const [letterRuntimes, setLetterRuntimes] = useState<LetterRuntime[]>([]);
     const [selectedLetterIds, setSelectedLetterIds] = useState<string[]>([]);
+
+    const [stacks, setStacks] = useState<{
+        undo: LetterRuntime[][];
+        redo: LetterRuntime[][];
+    }>({
+        undo: [],
+        redo: [],
+    });
+
+    const hasReceivedLetterRuntimes = useRef(false);
+
+    function PushUndoState(newState: LetterRuntime[]) {
+        setStacks(prev => {
+            const { undo } = prev;
+            if (undo.length === 0 || (undo.length > 0 && !isEqual(undo[undo.length - 1], newState))) {
+                const newUndo = [...undo];
+                newUndo.push([...newState]);
+                if (newUndo.length > UNDO_LIMIT) {
+                    newUndo.shift();
+                }
+                return {
+                    ...prev,
+                    undo: newUndo,
+                };
+            }
+            return prev;
+        });
+    }
+
+    useEffect(() => {
+        if (!hasReceivedLetterRuntimes.current) {
+            if (letterRuntimes.length > 0) {
+                PushUndoState(letterRuntimes);
+                hasReceivedLetterRuntimes.current = true;
+            }
+        }
+    }, [letterRuntimes]);
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -53,6 +91,56 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, [isDraggingLetters, selectedLetterIds]);
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            const isCtrl = event.ctrlKey || event.metaKey;
+            const isCtrlY = event.key === 'y' && isCtrl;
+            const isCtrlZ = event.key === 'z' && isCtrl;
+            const isShiftZ = event.key === 'z' && event.shiftKey;
+            
+            // Undo
+            if (isCtrlZ && !isShiftZ) {
+                event.preventDefault();
+                setStacks(prev => {
+                    const { undo, redo } = prev;
+                    if (undo.length > 1) {
+                        const newUndo = undo.slice(0, undo.length - 1);
+                        const newRedo = [...redo, undo[undo.length - 1]];
+                        const newLetterRuntimes = undo[undo.length - 2];
+                        setLetterRuntimes(newLetterRuntimes);
+                        return {
+                            undo: newUndo,
+                            redo: newRedo,
+                        };
+                    }
+                    return prev;
+                });
+            }
+
+            // Redo
+            if ((isCtrlZ && isShiftZ) || isCtrlY) {
+                event.preventDefault();
+                setStacks(prev => {
+                    const { undo, redo } = prev;
+                    if (redo.length > 0) {
+                        const newRedo = redo.slice(0, redo.length - 1);
+                        const newUndo = [...undo, redo[redo.length - 1]];
+                        const newLetterRuntimes = redo[redo.length - 1];
+                        setLetterRuntimes(newLetterRuntimes);
+                        return {
+                            undo: newUndo,
+                            redo: newRedo,
+                        };
+                    }
+                    return prev;
+                });
+            }
+        };
+    
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+      }, [stacks]);
 
     useEffect(() => {
         const handleGlobalMouseUp = () => {
@@ -182,6 +270,8 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                         newLetterRuntimes[runtimeIndex] = updatedRuntime;
                     }
                 });
+
+                PushUndoState(newLetterRuntimes);
 
                 return newLetterRuntimes;
             });
