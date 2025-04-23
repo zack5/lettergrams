@@ -5,6 +5,7 @@ import { GRID_SIZE } from '../constants/Constants';
 import { LetterRuntime } from '../types/LetterRuntime';
 
 import { getPositionFromCoords } from '../utils/Utils';
+import { s } from 'motion/react-client';
 
 export const ContextNavigation = createContext<{
     isDraggingLetters: boolean;
@@ -68,7 +69,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
     useEffect(() => {
         const handleGlobalMouseUp = () => {
             // Deselect letters
-            if (isDraggingLetters) setSelectedLetterIds([]);
+            if (isDraggingLetters) setSelectedLetterIds(prev => prev.length > 1 ? prev : []);
 
             // Stop dragging
             setIsDraggingLetters(false);
@@ -77,14 +78,90 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
             setLetterRuntimes(prev => {
                 const newLetterRuntimes = [...prev];
 
-                // Intentionally using un-updated selectecLetterIds
-                selectedLetterIds.forEach(id => {
+                // 1. originalSpaces: orignal spaces from which we are moving
+                // 2. targetSpaces: spaces to which we are moving
+                // 3. freedSpaces: orignal - target
+                // 4. occupiedSpaces: target - original
+                // 5. sort freedSpaces and occupiedSpaces by sweeping through the spaces in a wave pattern according to drag direction
+                // 6. for every Runtime in occupiedSpaces, move it to corresponding place in freedSpaces
+
+                // This function intentionally references un-updated selectedLetterIds
+
+                interface GridSpace {
+                    row: number;
+                    col: number;
+                }
+
+                const originalSpaces : GridSpace[] = selectedLetterIds.map(id => {
+                    const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === id);
+                    if (runtimeIndex !== -1) {
+                        const runtime = newLetterRuntimes[runtimeIndex];
+                        return { row: runtime.row, col: runtime.col };
+                    }
+                    return { row: -1, col: -1 };
+                });
+
+                const targetSpaces : GridSpace[] = selectedLetterIds.map(id => {
                     const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === id);
                     if (runtimeIndex !== -1) {
                         const runtime = newLetterRuntimes[runtimeIndex];
                         const targetRow = Math.round(runtime.positionWhileDragging.y / GRID_SIZE);
                         const targetCol = Math.round(runtime.positionWhileDragging.x / GRID_SIZE);
+                        return { row: targetRow, col: targetCol };
+                    }
+                    return { row: -1, col: -1 };
+                });
 
+                const isSameSpace = (a : GridSpace, b : GridSpace) => a.row === b.row && a.col === b.col;
+
+                const freedSpaces = originalSpaces.filter(
+                  original => !targetSpaces.some(target => isSameSpace(original, target))
+                );
+                
+                const occupiedSpaces = targetSpaces.filter(
+                  target => !originalSpaces.some(original => isSameSpace(target, original))
+                );
+                
+                if (selectedLetterIds.length <= 0) {
+                    console.assert(selectedLetterIds.length > 0, "Should have at least one selected letter");
+                } else {
+                    const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === selectedLetterIds[0]);
+                    if (runtimeIndex === -1) {
+                        console.error("Should have one runtime for each selected letter");
+                    } else {
+                        const runtime = newLetterRuntimes[runtimeIndex];
+                        // final - initial
+                        const dy = Math.round(runtime.positionWhileDragging.y / GRID_SIZE) - runtime.row;
+                        const dx = Math.round(runtime.positionWhileDragging.x / GRID_SIZE) - runtime.col;
+
+                        const sortingValue = (a: GridSpace) => {
+                            return a.row * dx - a.col * dy;
+                        }
+
+                        const sortingFunction = (a: GridSpace, b: GridSpace) => {
+                            return sortingValue(a) - sortingValue(b);
+                        };
+        
+                        freedSpaces.sort(sortingFunction);
+                        occupiedSpaces.sort(sortingFunction);
+                    }
+                }
+
+                console.assert(freedSpaces.length === occupiedSpaces.length,
+                    "Freed spaces and occupied spaces should be the same length");
+
+                // Move letters from occupiedSpaces to freedSpaces
+                for (let i = 0; i < occupiedSpaces.length; i++) {
+                    const occupiedSpace = occupiedSpaces[i];
+
+                    const runtimeIndex = newLetterRuntimes.findIndex(letter => {
+                        return letter.row === occupiedSpace.row && letter.col === occupiedSpace.col;
+                    });
+                    
+                    if (runtimeIndex !== -1) {
+                        const runtime = newLetterRuntimes[runtimeIndex];
+                        const targetRow = freedSpaces[i].row;
+                        const targetCol = freedSpaces[i].col;
                         const updatedRuntime = {
                             ...runtime,
                             row: targetRow,
@@ -92,18 +169,25 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                             positionWhileDragging: getPositionFromCoords(targetRow, targetCol),
                         }
 
-                        // Swap letters if one was present in new spot
-                        const index = newLetterRuntimes.findIndex(letter => letter.row === targetRow && letter.col === targetCol);
-                        if (index !== -1) {
-                            const existingLetter = newLetterRuntimes[index];
-                            if (!selectedLetterIds.includes(existingLetter.id)) {
-                                newLetterRuntimes[index] = {
-                                    ...existingLetter,
-                                    row: runtime.row,
-                                    col: runtime.col,
-                                    positionWhileDragging: getPositionFromCoords(runtime.row, runtime.col),
-                                };
-                            }
+                        newLetterRuntimes[runtimeIndex] = updatedRuntime;
+                    }
+                }
+
+                selectedLetterIds.forEach(id => {
+                    const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === id);
+
+                    const found = runtimeIndex !== -1;
+                    if (!found) {
+                        console.error("Should have one runtime for each selected letter");
+                    } else {
+                        const runtime = newLetterRuntimes[runtimeIndex];
+                        const targetRow = Math.round(runtime.positionWhileDragging.y / GRID_SIZE);
+                        const targetCol = Math.round(runtime.positionWhileDragging.x / GRID_SIZE);
+                        const updatedRuntime = {
+                            ...runtime,
+                            row: targetRow,
+                            col: targetCol,
+                            positionWhileDragging: getPositionFromCoords(targetRow, targetCol),
                         }
                         
                         newLetterRuntimes[runtimeIndex] = updatedRuntime;
