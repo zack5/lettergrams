@@ -76,6 +76,10 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
             
             // Resolve placement
             setLetterRuntimes(prev => {
+                if (selectedLetterIds.length <= 0) {
+                    return prev;
+                }
+
                 const newLetterRuntimes = [...prev];
 
                 // 1. originalSpaces: orignal spaces from which we are moving
@@ -121,30 +125,26 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                 const occupiedSpaces = targetSpaces.filter(
                   target => !originalSpaces.some(original => isSameSpace(target, original))
                 );
-                
-                if (selectedLetterIds.length <= 0) {
-                    console.assert(selectedLetterIds.length > 0, "Should have at least one selected letter");
+
+                const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === selectedLetterIds[0]);
+                if (runtimeIndex === -1) {
+                    console.error("Should have one runtime for each selected letter");
                 } else {
-                    const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === selectedLetterIds[0]);
-                    if (runtimeIndex === -1) {
-                        console.error("Should have one runtime for each selected letter");
-                    } else {
-                        const runtime = newLetterRuntimes[runtimeIndex];
-                        // final - initial
-                        const dy = Math.round(runtime.positionWhileDragging.y / GRID_SIZE) - runtime.row;
-                        const dx = Math.round(runtime.positionWhileDragging.x / GRID_SIZE) - runtime.col;
+                    const runtime = newLetterRuntimes[runtimeIndex];
+                    // final - initial
+                    const dy = Math.round(runtime.positionWhileDragging.y / GRID_SIZE) - runtime.row;
+                    const dx = Math.round(runtime.positionWhileDragging.x / GRID_SIZE) - runtime.col;
 
-                        const sortingValue = (a: GridSpace) => {
-                            return a.row * dx - a.col * dy;
-                        }
-
-                        const sortingFunction = (a: GridSpace, b: GridSpace) => {
-                            return sortingValue(a) - sortingValue(b);
-                        };
-        
-                        freedSpaces.sort(sortingFunction);
-                        occupiedSpaces.sort(sortingFunction);
+                    const sortingValue = (a: GridSpace) => {
+                        return a.row * dx - a.col * dy;
                     }
+
+                    const sortingFunction = (a: GridSpace, b: GridSpace) => {
+                        return sortingValue(a) - sortingValue(b);
+                    };
+    
+                    freedSpaces.sort(sortingFunction);
+                    occupiedSpaces.sort(sortingFunction);
                 }
 
                 console.assert(freedSpaces.length === occupiedSpaces.length,
@@ -173,6 +173,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                     }
                 }
 
+                // Move letters that were dragged
                 selectedLetterIds.forEach(id => {
                     const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === id);
 
