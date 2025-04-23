@@ -1,6 +1,10 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Game from './pages/Game'
+
 import { ContextNavigationProvider } from "./contexts/ContextNavigation";
+
+import About from './pages/About'
+import Game from './pages/Game'
+import NotFound from './pages/NotFound'
 
 export default function App() {
   return (
@@ -10,7 +14,9 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Game letters="ABC" />} />
               <Route path="/play/:letters" element={<Game />} />
-            </Routes>
+              <Route path="/about" element={<About />} />
+              <Route path="*" element={<NotFound />} />
+              </Routes>
           </BrowserRouter>
       </ContextNavigationProvider>
     </>
