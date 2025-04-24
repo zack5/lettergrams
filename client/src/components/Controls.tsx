@@ -5,6 +5,8 @@ import { ImCommand, ImShift } from "react-icons/im";
 export default function Controls() {
     const [isOpen, setIsOpen] = useState(false);
 
+    const MAGIC_WIDTH = 113;
+
     // TODO: whole thing should be clickable
     // TODO: animation
     return (
@@ -22,8 +24,8 @@ export default function Controls() {
             </span>
             <motion.div
                 style={{ overflow: 'auto', height: 'auto' }}
-                initial={{ width: 'auto' }}
-                animate={{ width: isOpen ? 'auto' : 113 }}
+                initial={{ width: MAGIC_WIDTH }}
+                animate={{ width: isOpen ? 'auto' : MAGIC_WIDTH }}
             >
                 <motion.div
                     style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}
