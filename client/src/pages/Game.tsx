@@ -3,6 +3,7 @@ import { useContext, useEffect } from "react";
 
 import Board from "../components/Board";
 import GameLetter from "../components/GameLetter";
+import LogoInGame from "../components/LogoInGame";
 
 import { ContextNavigation } from "../contexts/ContextNavigation";
 import { LetterRuntime } from "../types/LetterRuntime";
@@ -33,6 +34,7 @@ export default function Game({letters : propLetters}: {letters?: string}) {
         <main className="game">
             <Board />
             {letterElements}
+            <LogoInGame />
         </main>
     );
 }
