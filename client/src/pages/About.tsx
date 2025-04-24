@@ -2,6 +2,7 @@ import { IoMail, IoLogoLinkedin, IoLogoGithub } from "react-icons/io5";
 
 import DocumentPage from "../components/DocumentPage"
 import LetterHeader from "../components/LetterHeader"
+import HomeLink from "../components/HomeLink";
 
 export default function About() {
     return (
@@ -31,6 +32,8 @@ export default function About() {
                 <span>github.com/zack5</span>
                 </div>
             </a>
+            <br />
+            <HomeLink />
         </DocumentPage>
     )
 }

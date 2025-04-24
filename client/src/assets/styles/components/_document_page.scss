@@ -3,15 +3,15 @@
 .document-page-container {
     width: 100%;
     max-width: 800px;
-    min-height: 100vh;
     margin-inline: auto;
     
     display: flex;
     flex-direction: column;
-  
+    
     font-family: 'Roboto', sans-serif;
-  }
-  
-  .document-page-contents {
+}
+
+.document-page-contents {
+    min-height: calc(100vh - 2 * variables.$content-margins);
     padding: variables.$content-margins;
   }

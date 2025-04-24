@@ -2,7 +2,7 @@
 
 .letter {
     background-color: variables.$color-tile;
-    color: #000000;
+    color: variables.$color-tile-text;
 
     display: flex;
     justify-content: center;
