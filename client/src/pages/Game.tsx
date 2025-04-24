@@ -2,6 +2,7 @@ import { useParams } from "react-router";
 import { useContext, useEffect } from "react";
 
 import Board from "../components/Board";
+import Controls from "../components/Controls";
 import GameLetter from "../components/GameLetter";
 import LogoInGame from "../components/LogoInGame";
 
@@ -34,6 +35,7 @@ export default function Game({letters : propLetters}: {letters?: string}) {
         <main className="game">
             <Board />
             {letterElements}
+            <Controls />
             <LogoInGame />
         </main>
     );

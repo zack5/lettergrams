@@ -10,13 +10,25 @@ main.game {
     width: 100vw;
 }
 
-.in-game-text-container {
+button.in-game-text-container {
     background-color: rgba(color.adjust(variables.$color-background, $lightness: -4%), 0.8);
     backdrop-filter: blur(2px);
-    color: #b8b8b8;
+    color: variables.$color-text-1;
+    font: inherit;
+    margin: 0;
     padding-block: 0.5rem;
     padding-inline: 1rem;
     position: absolute;
     z-index: 10;
-    border-radius: 5px;
+    border-radius: 7px;
+}
+
+button.in-game-text-container.bottom-left {
+    bottom: 0;
+    left: 0;
+}
+
+button.in-game-text-container.bottom-right {
+    bottom: 0;
+    right: 0;
 }

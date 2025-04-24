@@ -1,0 +1,39 @@
+@use 'sass:color';
+@use "../base/variables";
+
+.controls-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+table.controls {
+  text-align: left;
+  border-spacing: 0.2rem 0.2rem;
+  background-color: rgba(color.adjust(variables.$color-background, $lightness: -8%), 0.8);
+  border-radius: 5px;
+  padding-inline: 0.8rem;
+  padding-block: 0.4rem;
+  margin-block: 0.4rem;
+}
+
+.keybinding {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: end;
+  color: variables.$color-text-2;
+  gap: 2px;
+}
+
+.keybinding > svg {
+  margin-left: -2px;
+  margin-top: 1px;
+}
+
+.control-name {
+  // font-weight: lighter;
+  // color: variables.$color-text;
+}
