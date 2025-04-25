@@ -7,7 +7,6 @@ import { GRID_SIZE } from "../constants/Constants";
 import { ContextNavigation } from "../contexts/ContextNavigation";
 
 import { getPositionFromCoords } from "../utils/Utils";
-import { initial } from "lodash";
 
 export default function GameLetter({ id }: { id: string }) {
     const { isDraggingLetters, setIsDraggingLetters, letterRuntimes, selectedLetterIds, setSelectedLetterIds } = useContext(ContextNavigation);

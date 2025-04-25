@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Letter from "../components/Letter";
-import { del } from "motion/react-client";
 
 export default function GameLetter() {
     const LETTER_SIZE = 45;
