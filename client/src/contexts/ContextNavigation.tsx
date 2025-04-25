@@ -14,19 +14,24 @@ export const ContextNavigation = createContext<{
     setLetterRuntimes: (letterRuntimes: LetterRuntime[] | ((prev: LetterRuntime[]) => LetterRuntime[])) => void;
     selectedLetterIds: string[];
     setSelectedLetterIds: (selectedLetterIds: string[] | ((prev: string[]) => string[])) => void;
+    dialogIsOpen: boolean;
+    setDialogIsOpen: (dialogIsOpen: boolean | ((prev: boolean) => boolean)) => void;
 }>({
     isDraggingLetters: false,
     setIsDraggingLetters: () => {},
     letterRuntimes: [],
     setLetterRuntimes: () => {},
     selectedLetterIds: [],
-    setSelectedLetterIds: () => {}
+    setSelectedLetterIds: () => {},
+    dialogIsOpen: false,
+    setDialogIsOpen: () => {},
 });
 
 export function ContextNavigationProvider({ children }: { children: React.ReactNode }) {
     const [isDraggingLetters, setIsDraggingLetters] = useState<boolean>(false);
     const [letterRuntimes, setLetterRuntimes] = useState<LetterRuntime[]>([]);
     const [selectedLetterIds, setSelectedLetterIds] = useState<string[]>([]);
+    const [dialogIsOpen, setDialogIsOpen] = useState<boolean>(false);
 
     const [stacks, setStacks] = useState<{
         undo: LetterRuntime[][];
@@ -289,6 +294,8 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
             setLetterRuntimes,
             selectedLetterIds,
             setSelectedLetterIds,
+            dialogIsOpen,
+            setDialogIsOpen,
         }}>
             {children}
         </ContextNavigation.Provider>

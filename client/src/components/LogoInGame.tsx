@@ -1,12 +1,14 @@
-import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+
+import { ContextNavigation } from "../contexts/ContextNavigation";
 
 export default function LogoInGame() {
-    const navigate = useNavigate();
+    const { setDialogIsOpen } = useContext(ContextNavigation);
 
     return (
         <button
             className="in-game-text-container bottom-left" 
-            onClick={() => navigate('/')}>
+            onClick={() => setDialogIsOpen(true)}>
             <h3 style={{margin:0}}>LetterGrams</h3>
         </button>
     )

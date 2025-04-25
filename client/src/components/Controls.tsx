@@ -7,8 +7,6 @@ export default function Controls() {
 
     const MAGIC_WIDTH = 113;
 
-    // TODO: whole thing should be clickable
-    // TODO: animation
     return (
         <button 
             className="in-game-text-container bottom-right"

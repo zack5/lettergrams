@@ -1,0 +1,43 @@
+@use "../base/variables";
+
+.dialog-container {
+    position: relative;
+    z-index: 50;
+}
+
+.dialog-backdrop {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    width: 100vw;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background-color: rgb(0, 0, 0, 0.3);
+}
+
+.dialog-panel {
+    max-width: 32rem;
+    background-color: rgba(variables.$color-background, 0.7);
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+}
+
+.dialog-title {
+    margin: 0;
+    margin-bottom: -0.8rem;
+}
+
+.dialog-description {
+    color: variables.$color-text-1;
+    font-size: 1rem;
+}
+
+.dialog-actions {
+    display: flex;
+    gap: 1rem;
+}

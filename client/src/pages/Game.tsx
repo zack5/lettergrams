@@ -3,6 +3,7 @@ import { useContext, useEffect } from "react";
 
 import Board from "../components/Board";
 import Controls from "../components/Controls";
+import DialogExitGame from "../components/DialogExitGame";
 import GameLetter from "../components/GameLetter";
 import LogoInGame from "../components/LogoInGame";
 
@@ -37,6 +38,7 @@ export default function Game({letters : propLetters}: {letters?: string}) {
             {letterElements}
             <Controls />
             <LogoInGame />
+            <DialogExitGame />
         </main>
     );
 }

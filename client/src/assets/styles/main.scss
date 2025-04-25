@@ -2,6 +2,7 @@
 
 @use "./components/board";
 @use "./components/controls";
+@use "./components/dialog";
 @use "./components/document_page";
 @use "./components/drag_bounds";
 @use "./components/letter";
@@ -64,7 +65,7 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: variables.$color-background;
+  background-color: variables.$color-background-1;
   cursor: pointer;
   transition: border-color 0.25s;
 }
