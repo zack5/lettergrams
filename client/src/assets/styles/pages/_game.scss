@@ -11,8 +11,8 @@ main.game {
 }
 
 button.in-game-text-container {
-    background-color: rgba(color.adjust(variables.$color-background, $lightness: -4%), 0.8);
-    backdrop-filter: blur(2px);
+    background-color: rgba(variables.$color-background-1, 0.8);
+    backdrop-filter: blur(10px);
     color: variables.$color-text-1;
     font: inherit;
     margin: 0;

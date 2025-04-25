@@ -32,6 +32,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
     const [letterRuntimes, setLetterRuntimes] = useState<LetterRuntime[]>([]);
     const [selectedLetterIds, setSelectedLetterIds] = useState<string[]>([]);
     const [dialogIsOpen, setDialogIsOpen] = useState<boolean>(false);
+    const [mousePosition, setMousePosition] = useState<{x: number, y: number}>({x: 0, y: 0});
 
     const [stacks, setStacks] = useState<{
         undo: LetterRuntime[][];
@@ -72,6 +73,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
+            setMousePosition({ x: e.clientX, y: e.clientY });
             if (isDraggingLetters) {
                 setLetterRuntimes(prev => {
                     const newLetterRuntimes = prev.map(runtime => {
@@ -100,9 +102,10 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             const isCtrl = event.ctrlKey || event.metaKey;
+            const isShift = event.shiftKey;
             const isCtrlY = event.key === 'y' && isCtrl;
             const isCtrlZ = event.key === 'z' && isCtrl;
-            const isShiftZ = event.key === 'z' && event.shiftKey;
+            const isShiftZ = event.key === 'z' && isShift;
             
             // Undo
             if (isCtrlZ && !isShiftZ) {
@@ -141,11 +144,67 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                     return prev;
                 });
             }
+
+            function RotateLetters(clockwise: boolean) {
+                setLetterRuntimes(prev => {
+                    const newLetterRuntimes = [...prev];
+
+                    let closestIndex = -1;
+                    let closestDistance = Infinity;
+                    const offset = GRID_SIZE / 2;
+                    selectedLetterIds.forEach(id => {
+                        const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === id);
+                        if (runtimeIndex !== -1) {
+                            const l1Distance = Math.abs(newLetterRuntimes[runtimeIndex].positionWhileDragging.x - mousePosition.x + offset)
+                                + Math.abs(newLetterRuntimes[runtimeIndex].positionWhileDragging.y - mousePosition.y + offset);
+                            if (l1Distance < closestDistance) {
+                                closestDistance = l1Distance;
+                                closestIndex = runtimeIndex;
+                            }
+                        }
+                    });
+
+                    const centerPoint = newLetterRuntimes[closestIndex].positionWhileDragging;
+                    const cx = centerPoint.x;
+                    const cy = centerPoint.y;
+                    const dir = clockwise ? 1 : -1;
+
+                    selectedLetterIds.forEach(id => {
+                        const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === id);
+    
+                        const found = runtimeIndex !== -1;
+                        if (!found) {
+                            console.error("Should have one runtime for each selected letter");
+                        } else {
+                            const runtime = newLetterRuntimes[runtimeIndex];
+                            const x = runtime.positionWhileDragging.x;
+                            const y = runtime.positionWhileDragging.y;
+                            const updatedRuntime = {
+                                ...runtime,
+                                positionWhileDragging: {
+                                    x: cx - dir * (y - cy),
+                                    y: cy + dir * (x - cx),
+                                },
+                            }
+                            
+                            newLetterRuntimes[runtimeIndex] = updatedRuntime;
+                        }
+                    });
+
+                    return newLetterRuntimes;
+                });
+            }
+
+            // Rotate
+            if (event.key.toLowerCase() === 'r' && isDraggingLetters && selectedLetterIds.length >= 2) {
+                event.preventDefault();
+                RotateLetters(!isShift);
+            }
         };
     
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-      }, [stacks]);
+      }, [stacks, isDraggingLetters, selectedLetterIds, mousePosition]);
 
     useEffect(() => {
         const handleGlobalMouseUp = () => {
