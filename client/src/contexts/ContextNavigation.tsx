@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useRef } from 'react';
-import { forEach, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 
 import { GRID_SIZE, UNDO_LIMIT } from '../constants/Constants';
 
