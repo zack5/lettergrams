@@ -26,28 +26,3 @@ export default function Letter({ letter, extraClasses, props }: LetterProps) {
         </>
     );
 }
-
-// export default function Letter({ letter, extraClasses, props }: LetterProps) {
-//     return (
-//         <>
-//             <motion.div
-//                 className={`letter not-selectable ${extraClasses}`}
-//                 style={{
-//                     width: GRID_SIZE,
-//                     height: GRID_SIZE,
-//                 }}
-//                 {...props}
-//             >
-//                 {letter}
-//             </motion.div>
-//             <motion.div
-//                 className={`letter shadow not-selectable ${extraClasses}`}
-//                 style={{
-//                     width: GRID_SIZE,
-//                     height: GRID_SIZE,
-//                 }}
-//                 {...props}
-//             />
-//         </>
-//     );
-// }

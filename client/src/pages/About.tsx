@@ -8,7 +8,7 @@ export default function About() {
     return (
         <DocumentPage>
             <LetterHeader text="About" />
-            <h2>Lettergrams</h2>
+            <h2>LetterGrams</h2>
             <p>
                 This is a simple playground for manipulating letter tiles.
                 Share with your friends to compete to see who can form a valid scrabble grid the fastest!

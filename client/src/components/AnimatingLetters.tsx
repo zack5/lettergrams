@@ -86,10 +86,19 @@ export default function GameLetter() {
         return () => clearInterval(interval);
     }, []);
 
+    const backgroundSize = {
+        width: WIDTH * LETTER_SIZE,
+        height: HEIGHT * LETTER_SIZE,
+    }
+
     const letterElements = ANIMATIONS[frame].letters
         .map((letterData, i) => {
             const offset = ANIMATIONS[frame].offset;
-            const transform = `translate(${(letterData.x + offset.x) * LETTER_SIZE}px, ${-1 * (letterData.y + offset.y - Math.floor(HEIGHT/2)) * LETTER_SIZE}px)`;
+            const position = {
+                x: (letterData.x + offset.x) * LETTER_SIZE,
+                y: -1 * (letterData.y + offset.y - Math.floor(HEIGHT/2)) * LETTER_SIZE,
+            }
+            const transform = `translate(${position.x}px, ${position.y}px)`;
             return (
                 <Letter 
                     key={letterData.key}
@@ -102,6 +111,8 @@ export default function GameLetter() {
                             fontSize: '1.75rem',
                             top: 0,
                             left: 0,
+                            backgroundSize: `${backgroundSize.width}px ${backgroundSize.height}px`,
+                            backgroundPosition: `-${position.x}px -${position.y}px`,
                         },
                         initial: { transform },
                         animate: { transform },
@@ -117,7 +128,7 @@ export default function GameLetter() {
 
     return (
         <>
-            <div className="animating-letters" style={{ position: 'relative', width: LETTER_SIZE * WIDTH, height: LETTER_SIZE * HEIGHT }}>
+            <div className="animating-letters" style={{ position: 'relative', width: backgroundSize.width, height: backgroundSize.height }}>
                 {letterElements}
             </div>
         </>

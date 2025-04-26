@@ -1,4 +1,6 @@
-import { useContext } from "react";
+import { useEffect, useContext } from "react";
+
+import { useMotionValue, useSpring, useTransform } from "framer-motion";
 
 import Letter from "../components/Letter";
 
@@ -10,12 +12,31 @@ import { getPositionFromCoords } from "../utils/Utils";
 
 export default function GameLetter({ id }: { id: string }) {
     const { isDraggingLetters, setIsDraggingLetters, letterRuntimes, selectedLetterIds, setSelectedLetterIds } = useContext(ContextNavigation);
-    
+
     const runtime = letterRuntimes.find((letter) => letter.id === id);
     const letter = runtime?.letter || '';
-    const positionWhileDragging = runtime?.positionWhileDragging || { x: 0, y: 0 };
-    const positionFromCoordinates = getPositionFromCoords(runtime?.row || 0, runtime?.col || 0);
     const isSelected = selectedLetterIds.includes(id);
+    const position = isDraggingLetters && isSelected
+        ? runtime?.positionWhileDragging || { x: 0, y: 0 }
+        : getPositionFromCoords(runtime?.row || 0, runtime?.col || 0);
+
+    const rawX = useMotionValue(0);
+    const rawY = useMotionValue(0);
+
+    const smoothx = useSpring(rawX, { stiffness: 300, damping: 30 });
+    const smoothy = useSpring(rawY, { stiffness: 300, damping: 30 });
+
+    const x = isDraggingLetters && isSelected ? rawX : smoothx;
+    const y = isDraggingLetters && isSelected ? rawY : smoothy;
+
+    const backgroundPosition = useTransform([x, y], ([latestX, latestY]) => {
+        return `-${latestX}px -${latestY}px`;
+    });
+
+    useEffect(() => {
+        rawX.set(position.x);
+        rawY.set(position.y);
+    }, [position.x, position.y]);
 
     return (
         <Letter
@@ -23,21 +44,20 @@ export default function GameLetter({ id }: { id: string }) {
             extraClasses={`interactive ${isSelected ? 'selected' : ''}`}
             props={{
                 style: {
-                    width: GRID_SIZE, 
+                    x,
+                    y,
+                    width: GRID_SIZE,
                     height: GRID_SIZE,
                     position: 'absolute',
                     top: 0,
                     left: 0,
+                    backgroundPosition,
+                    backgroundSize: '100vw 100vh',
                 },
                 onMouseDown: () => {
                     setSelectedLetterIds(prev => isSelected ? prev : [id]);
                     setIsDraggingLetters(true);
                 },
-                animate: (isDraggingLetters && isSelected 
-                    ? { transform: `translate(${positionWhileDragging.x}px, ${positionWhileDragging.y}px)` }
-                    : { transform: `translate(${positionFromCoordinates.x}px, ${positionFromCoordinates.y}px)` }
-                ),
-                transition: { type: "spring", duration: isDraggingLetters ? 0 : 0.4 }
             }}
         />
     );
