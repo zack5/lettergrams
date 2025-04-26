@@ -23,11 +23,15 @@ export default function GameLetter({ id }: { id: string }) {
     const rawX = useMotionValue(0);
     const rawY = useMotionValue(0);
 
-    const smoothx = useSpring(rawX, { stiffness: 300, damping: 30 });
-    const smoothy = useSpring(rawY, { stiffness: 300, damping: 30 });
+    const springProperties = {
+        stiffness: 300,
+        damping: 30,
+    }
+    const smoothX = useSpring(rawX, springProperties);
+    const smoothY = useSpring(rawY, springProperties);
 
-    const x = isDraggingLetters && isSelected ? rawX : smoothx;
-    const y = isDraggingLetters && isSelected ? rawY : smoothy;
+    const x = isDraggingLetters && isSelected ? rawX : smoothX;
+    const y = isDraggingLetters && isSelected ? rawY : smoothY;
 
     const backgroundPosition = useTransform([x, y], ([latestX, latestY]) => {
         return `-${latestX}px -${latestY}px`;
