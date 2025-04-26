@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useRef } from 'react';
-import { isEqual } from 'lodash';
+import { forEach, isEqual } from 'lodash';
 
 import { GRID_SIZE, UNDO_LIMIT } from '../constants/Constants';
 
@@ -16,15 +16,17 @@ export const ContextNavigation = createContext<{
     setSelectedLetterIds: (selectedLetterIds: string[] | ((prev: string[]) => string[])) => void;
     dialogIsOpen: boolean;
     setDialogIsOpen: (dialogIsOpen: boolean | ((prev: boolean) => boolean)) => void;
+    windowDimensions: { width: number, height: number }
 }>({
     isDraggingLetters: false,
-    setIsDraggingLetters: () => {},
+    setIsDraggingLetters: () => { },
     letterRuntimes: [],
-    setLetterRuntimes: () => {},
+    setLetterRuntimes: () => { },
     selectedLetterIds: [],
-    setSelectedLetterIds: () => {},
+    setSelectedLetterIds: () => { },
     dialogIsOpen: false,
-    setDialogIsOpen: () => {},
+    setDialogIsOpen: () => { },
+    windowDimensions: { width: 0, height: 0 },
 });
 
 export function ContextNavigationProvider({ children }: { children: React.ReactNode }) {
@@ -32,7 +34,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
     const [letterRuntimes, setLetterRuntimes] = useState<LetterRuntime[]>([]);
     const [selectedLetterIds, setSelectedLetterIds] = useState<string[]>([]);
     const [dialogIsOpen, setDialogIsOpen] = useState<boolean>(false);
-    const [mousePosition, setMousePosition] = useState<{x: number, y: number}>({x: 0, y: 0});
+    const [mousePosition, setMousePosition] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
 
     const [stacks, setStacks] = useState<{
         undo: LetterRuntime[][];
@@ -42,7 +44,24 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
         redo: [],
     });
 
+    const [windowDimensions, setWindowDimensions] = useState({
+        width: window.innerWidth,
+        height: window.innerHeight,
+    });
+
     const hasReceivedLetterRuntimes = useRef(false);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowDimensions({
+                width: window.innerWidth,
+                height: window.innerHeight,
+            });
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     function PushUndoState(newState: LetterRuntime[]) {
         setStacks(prev => {
@@ -89,7 +108,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                             }
                         }
                     });
-                    
+
                     return newLetterRuntimes;
                 });
             }
@@ -106,7 +125,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
             const isCtrlY = event.key === 'y' && isCtrl;
             const isCtrlZ = event.key === 'z' && isCtrl;
             const isShiftZ = event.key === 'z' && isShift;
-            
+
             // Undo
             if (isCtrlZ && !isShiftZ) {
                 event.preventDefault();
@@ -171,7 +190,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
 
                     selectedLetterIds.forEach(id => {
                         const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === id);
-    
+
                         const found = runtimeIndex !== -1;
                         if (!found) {
                             console.error("Should have one runtime for each selected letter");
@@ -186,7 +205,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                                     y: cy + dir * (x - cx),
                                 },
                             }
-                            
+
                             newLetterRuntimes[runtimeIndex] = updatedRuntime;
                         }
                     });
@@ -201,20 +220,38 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                 RotateLetters(!isShift);
             }
         };
-    
+
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-      }, [stacks, isDraggingLetters, selectedLetterIds, mousePosition]);
+    }, [stacks, isDraggingLetters, selectedLetterIds, mousePosition]);
 
     useEffect(() => {
         const handleGlobalMouseUp = () => {
             // Stop dragging
             setIsDraggingLetters(false);
-            
+
             // Resolve placement
             setLetterRuntimes(prev => {
                 if (selectedLetterIds.length <= 0) {
                     return prev;
+                }
+
+                // Check if all tiles are in bounds
+                let allInBounds = true;
+                prev.forEach(letterRuntime => {
+                    if (selectedLetterIds.includes(letterRuntime.id)) {
+                        const pos = letterRuntime.positionWhileDragging;
+                        if (pos.x < 0 || pos.x > windowDimensions.width
+                            || pos.y < 0 || pos.y > windowDimensions.height
+                        ) {
+                            allInBounds = false;
+                        }
+                        return;
+                    }
+                })
+                if (!allInBounds) {
+                    // Revert to last valid state
+                    return stacks.undo[stacks.undo.length - 1];
                 }
 
                 const newLetterRuntimes = [...prev];
@@ -233,7 +270,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                     col: number;
                 }
 
-                const originalSpaces : GridSpace[] = selectedLetterIds.map(id => {
+                const originalSpaces: GridSpace[] = selectedLetterIds.map(id => {
                     const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === id);
                     if (runtimeIndex !== -1) {
                         const runtime = newLetterRuntimes[runtimeIndex];
@@ -242,7 +279,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                     return { row: -1, col: -1 };
                 });
 
-                const targetSpaces : GridSpace[] = selectedLetterIds.map(id => {
+                const targetSpaces: GridSpace[] = selectedLetterIds.map(id => {
                     const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === id);
                     if (runtimeIndex !== -1) {
                         const runtime = newLetterRuntimes[runtimeIndex];
@@ -253,14 +290,14 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                     return { row: -1, col: -1 };
                 });
 
-                const isSameSpace = (a : GridSpace, b : GridSpace) => a.row === b.row && a.col === b.col;
+                const isSameSpace = (a: GridSpace, b: GridSpace) => a.row === b.row && a.col === b.col;
 
                 const freedSpaces = originalSpaces.filter(
-                  original => !targetSpaces.some(target => isSameSpace(original, target))
+                    original => !targetSpaces.some(target => isSameSpace(original, target))
                 );
-                
+
                 const occupiedSpaces = targetSpaces.filter(
-                  target => !originalSpaces.some(original => isSameSpace(target, original))
+                    target => !originalSpaces.some(original => isSameSpace(target, original))
                 );
 
                 const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === selectedLetterIds[0]);
@@ -279,7 +316,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                     const sortingFunction = (a: GridSpace, b: GridSpace) => {
                         return sortingValue(a) - sortingValue(b);
                     };
-    
+
                     freedSpaces.sort(sortingFunction);
                     occupiedSpaces.sort(sortingFunction);
                 }
@@ -294,7 +331,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                     const runtimeIndex = newLetterRuntimes.findIndex(letter => {
                         return letter.row === occupiedSpace.row && letter.col === occupiedSpace.col;
                     });
-                    
+
                     if (runtimeIndex !== -1) {
                         const runtime = newLetterRuntimes[runtimeIndex];
                         const targetRow = freedSpaces[i].row;
@@ -327,7 +364,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                             col: targetCol,
                             positionWhileDragging: getPositionFromCoords(targetRow, targetCol),
                         }
-                        
+
                         newLetterRuntimes[runtimeIndex] = updatedRuntime;
                     }
                 });
@@ -345,13 +382,14 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
     return (
         <ContextNavigation.Provider value={{
             isDraggingLetters,
-            setIsDraggingLetters, 
+            setIsDraggingLetters,
             letterRuntimes,
             setLetterRuntimes,
             selectedLetterIds,
             setSelectedLetterIds,
             dialogIsOpen,
             setDialogIsOpen,
+            windowDimensions,
         }}>
             {children}
         </ContextNavigation.Provider>

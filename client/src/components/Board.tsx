@@ -1,30 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import DragBounds from './DragBounds';
+
+import { ContextNavigation } from '../contexts/ContextNavigation';
 
 import { GRID_SIZE } from '../constants/Constants';
 
 export default function Board() {
+    const { windowDimensions } = useContext(ContextNavigation);
+
     const [isDragging, setIsDragging] = useState(false);
     const [startPosition, setStartPosition] = useState({ x: -1, y: -1 });
     const [currentPosition, setCurrentPosition] = useState({ x: -1, y: -1 });
-    const [dimensions, setDimensions] = useState({
-        width: window.innerWidth,
-        height: window.innerHeight,
-    });
 
-    useEffect(() => {
-        const handleResize = () => {
-            setDimensions({
-            width: window.innerWidth,
-            height: window.innerHeight,
-            });
-        };
-
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-    
     useEffect(() => {
         const handleGlobalMouseUp = () => {
             setIsDragging(false);
@@ -49,13 +37,13 @@ export default function Board() {
     const verticalLines = [];
     const horizontalLines = [];
   
-    for (let x = GRID_SIZE; x <= dimensions.width; x += GRID_SIZE) {
+    for (let x = GRID_SIZE; x <= windowDimensions.width; x += GRID_SIZE) {
         verticalLines.push(
             <div key={`v-${x}`} className="grid-line vertical" style={{ left: x }} />
         );
     }
   
-    for (let y = GRID_SIZE; y <= dimensions.height; y += GRID_SIZE) {
+    for (let y = GRID_SIZE; y <= windowDimensions.height; y += GRID_SIZE) {
         horizontalLines.push(
             <div key={`h-${y}`} className="grid-line horizontal" style={{ top: y }} />
         );
