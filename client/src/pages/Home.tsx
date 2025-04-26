@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Input, Label, Field } from '@headlessui/react'
 
@@ -7,12 +7,26 @@ import DocumentPage from "../components/DocumentPage"
 
 export default function Home() {
     const [letters, setLetters] = useState<string>("");
+    const lettersInputRef = useRef<HTMLInputElement | null>(null);
 
     const navigate = useNavigate();
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        navigate(`/play/${letters}`);
+
+        const lettersInput = lettersInputRef.current;
+
+        if (lettersInput) {
+            const letterOnlyRegex = /^[A-Za-z]+$/;
+            if (!letterOnlyRegex.test(lettersInput.value)) {
+                lettersInput.setCustomValidity("Please enter only letters.")
+                lettersInput.reportValidity();
+                return;
+            }
+
+            lettersInput.setCustomValidity("");
+            navigate(`/play/${letters}`);
+        }
     }
 
     return (
@@ -22,10 +36,10 @@ export default function Home() {
                 <form onSubmit={handleSubmit} aria-labelledby="lettersFormTitle">
                     <h2 id="lettersFormTitle" className="visually-hidden">Enter letters to play with:</h2>
                     <Field>
-                        <Label htmlFor="lettersInput" className="visually-hidden">Letters:</Label>
+                        <Label className="visually-hidden">Letters:</Label>
                         <Input
                             className="custom-input"
-                            id="lettersInput"
+                            ref={lettersInputRef}
                             type="text"
                             name="lettersInput"
                             placeholder="Enter letters"
