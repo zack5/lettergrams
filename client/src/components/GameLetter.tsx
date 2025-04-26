@@ -84,11 +84,22 @@ export default function GameLetter({ id }: { id: string }) {
                     backgroundPosition,
                     backgroundSize: '100vw 100vh',
                 },
-                onMouseDown: () => {
-                    setSelectedLetterIds(prev => isSelected ? prev : [id]);
+                onMouseDown: (event: React.MouseEvent) => {
+                    if (event.shiftKey) {
+                        setSelectedLetterIds(prev => 
+                            prev.includes(id) 
+                                ? prev.filter(existingId => existingId !== id)
+                                : [...prev, id]
+                        );
+                    } else if (event.metaKey || event.ctrlKey) {
+                        setSelectedLetterIds(prev => [...prev, id])
+                    } else { 
+                        setSelectedLetterIds(prev => isSelected ? prev : [id]);
+                    }
                     setIsDraggingLetters(true);
                 },
-            }}
+                }
+            }
         />
     );
 }

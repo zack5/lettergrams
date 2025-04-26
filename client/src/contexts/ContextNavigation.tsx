@@ -208,9 +208,6 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
 
     useEffect(() => {
         const handleGlobalMouseUp = () => {
-            // Deselect letters
-            if (isDraggingLetters) setSelectedLetterIds(prev => prev.length > 1 ? prev : []);
-
             // Stop dragging
             setIsDraggingLetters(false);
             
