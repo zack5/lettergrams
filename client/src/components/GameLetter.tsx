@@ -68,6 +68,22 @@ export default function GameLetter({ id }: { id: string }) {
         return `-${latestX}px -${latestY}px`;
     });
 
+    const onPressStart = (event : TouchEvent | MouseEvent) => {
+        event.preventDefault();
+        if ('shiftKey' in event && event.shiftKey) {
+            setSelectedLetterIds(prev => 
+                prev.includes(id) 
+                    ? prev.filter(existingId => existingId !== id)
+                    : [...prev, id]
+            );
+        } else if ('metaKey' in event && (event.metaKey || event.ctrlKey)) {
+            setSelectedLetterIds(prev => [...prev, id]);
+        } else { 
+            setSelectedLetterIds(prev => isSelected ? prev : [id]);
+        }
+        setIsDraggingLetters(true);
+    }
+
     return (
         <Letter
             letter={letter}
@@ -84,20 +100,8 @@ export default function GameLetter({ id }: { id: string }) {
                     backgroundPosition,
                     backgroundSize: '100vw 100vh',
                 },
-                onMouseDown: (event: React.MouseEvent) => {
-                    if (event.shiftKey) {
-                        setSelectedLetterIds(prev => 
-                            prev.includes(id) 
-                                ? prev.filter(existingId => existingId !== id)
-                                : [...prev, id]
-                        );
-                    } else if (event.metaKey || event.ctrlKey) {
-                        setSelectedLetterIds(prev => [...prev, id])
-                    } else { 
-                        setSelectedLetterIds(prev => isSelected ? prev : [id]);
-                    }
-                    setIsDraggingLetters(true);
-                },
+                onMouseDown: onPressStart,
+                onTouchStart: onPressStart,
                 }
             }
         />

@@ -14,35 +14,81 @@ export default function Board() {
     const [currentPosition, setCurrentPosition] = useState({ x: -1, y: -1 });
 
     useEffect(() => {
-        const handleGlobalMouseUp = () => {
+        const handleGlobalEnd = () => {
             setIsDragging(false);
             setStartPosition({ x: -1, y: -1 });
             setCurrentPosition({ x: -1, y: -1 });
         };
 
-        window.addEventListener('mouseup', handleGlobalMouseUp);
-        return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
+        window.addEventListener('mouseup', handleGlobalEnd);
+        window.addEventListener('touchend', handleGlobalEnd);
+
+        return () => {
+            window.removeEventListener('mouseup', handleGlobalEnd);
+            window.removeEventListener('touchend', handleGlobalEnd);
+        };
     }, []);
 
     useEffect(() => {
-        const handleGlobalMouseMove = (e: MouseEvent) => {
+        const handleGlobalMove = (e: TouchEvent | MouseEvent) => {
+            e.preventDefault();
+            console.log(e);
             if (isDragging) {
-                setCurrentPosition({ x: e.clientX, y: e.clientY });
+                if (window.TouchEvent && e instanceof window.TouchEvent) {
+                    if (e.touches.length > 0) {
+                        setCurrentPosition({
+                            x: e.touches[0].clientX,
+                            y: e.touches[0].clientY
+                        });
+                    }
+                } else if (e instanceof MouseEvent) {
+                    setCurrentPosition({
+                        x: e.clientX,
+                        y: e.clientY
+                    });
+                }
             }
         };
-        window.addEventListener('mousemove', handleGlobalMouseMove);
-        return () => window.removeEventListener('mousemove', handleGlobalMouseMove);
+
+        window.addEventListener('mousemove', handleGlobalMove);
+        window.addEventListener('touchmove', handleGlobalMove);
+
+        return () => {
+            window.removeEventListener('mousemove', handleGlobalMove);
+            window.removeEventListener('touchmove', handleGlobalMove);
+        };
     }, [isDragging]);
+
+    const handlePressStart = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+        let clientX: number;
+        let clientY: number;
+
+        if (e.type === "mousedown") {
+            const mouseEvent = e as React.MouseEvent<HTMLDivElement>;
+            clientX = mouseEvent.clientX;
+            clientY = mouseEvent.clientY;
+        } else if (e.type === "touchstart") {
+            const touchEvent = e as React.TouchEvent<HTMLDivElement>;
+            clientX = touchEvent.touches[0].clientX;
+            clientY = touchEvent.touches[0].clientY;
+        } else {
+            return;
+        }
+
+        setIsDragging(true);
+        setStartPosition({ x: clientX, y: clientY });
+        setCurrentPosition({ x: clientX, y: clientY });
+    }
 
     const verticalLines = [];
     const horizontalLines = [];
-  
+
     for (let x = GRID_SIZE; x <= windowDimensions.width; x += GRID_SIZE) {
         verticalLines.push(
             <div key={`v-${x}`} className="grid-line vertical" style={{ left: x }} />
         );
     }
-  
+
     for (let y = GRID_SIZE; y <= windowDimensions.height; y += GRID_SIZE) {
         horizontalLines.push(
             <div key={`h-${y}`} className="grid-line horizontal" style={{ top: y }} />
@@ -52,11 +98,8 @@ export default function Board() {
     return (
         <div
             className="board"
-            onMouseDown={(e) => {
-                setIsDragging(true);
-                setStartPosition({ x: e.clientX, y: e.clientY });
-                setCurrentPosition({ x: e.clientX, y: e.clientY });
-            }}
+            onMouseDown={handlePressStart}
+            onTouchStart={handlePressStart}
         >
             {verticalLines}
             {horizontalLines}

@@ -5,7 +5,7 @@ import { GRID_SIZE, UNDO_LIMIT } from '../constants/Constants';
 
 import { LetterRuntime } from '../types/LetterRuntime';
 
-import { getPositionFromCoords } from '../utils/Utils';
+import { getCoordsFromPosition, getPositionFromCoords } from '../utils/Utils';
 
 export const ContextNavigation = createContext<{
     isDraggingLetters: boolean;
@@ -91,32 +91,62 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
     }, [letterRuntimes]);
 
     useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            setMousePosition({ x: e.clientX, y: e.clientY });
+        const handleMove = (e: MouseEvent | TouchEvent) => {
+            e.preventDefault();
+            let clientX: number, clientY: number, movementX = 0, movementY = 0;
+    
+            if (window.TouchEvent && e instanceof window.TouchEvent) {
+                if (e.touches.length > 0) {
+                    const touch = e.touches[0];
+                    clientX = touch.clientX;
+                    clientY = touch.clientY;
+    
+                    // Calculate movement manually for touch
+                    setMousePosition(prev => {
+                        movementX = clientX - prev.x;
+                        movementY = clientY - prev.y;
+                        return { x: clientX, y: clientY };
+                    });
+                } else {
+                    return; // no touch to process
+                }
+            } else if (e instanceof MouseEvent) {
+                clientX = e.clientX;
+                clientY = e.clientY;
+                movementX = e.movementX;
+                movementY = e.movementY;
+                
+                setMousePosition({ x: clientX, y: clientY });
+            }
+    
             if (isDraggingLetters) {
                 setLetterRuntimes(prev => {
-                    const newLetterRuntimes = prev.map(runtime => {
+                    return prev.map(runtime => {
                         if (!selectedLetterIds.includes(runtime.id))
                             return runtime;
-
+    
                         const startingPos = runtime.positionWhileDragging;
                         return {
                             ...runtime,
                             positionWhileDragging: {
-                                x: startingPos.x + e.movementX,
-                                y: startingPos.y + e.movementY,
+                                x: startingPos.x + movementX,
+                                y: startingPos.y + movementY,
                             }
-                        }
+                        };
                     });
-
-                    return newLetterRuntimes;
                 });
             }
         };
-
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
+    
+        window.addEventListener('mousemove', handleMove);
+        window.addEventListener('touchmove', handleMove, { passive: false });
+    
+        return () => {
+            window.removeEventListener('mousemove', handleMove);
+            window.removeEventListener('touchmove', handleMove);
+        };
     }, [isDraggingLetters, selectedLetterIds]);
+    
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -240,7 +270,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                 let allInBounds = true;
                 prev.forEach(letterRuntime => {
                     if (selectedLetterIds.includes(letterRuntime.id)) {
-                        const pos = letterRuntime.positionWhileDragging;
+                        const pos = getPositionFromCoords(getCoordsFromPosition(letterRuntime.positionWhileDragging));
                         if (pos.x < 0 || pos.x > windowDimensions.width
                             || pos.y < 0 || pos.y > windowDimensions.height
                         ) {
