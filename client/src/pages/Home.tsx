@@ -33,6 +33,9 @@ export default function Home() {
         <DocumentPage>
             <div className="page-container">
                 <AnimatingLetters />
+                <div className="mobile-only">
+                    <b>Warning:</b> LetterGrams is not yet optimized for mobile!
+                </div>
                 <form onSubmit={handleSubmit} aria-labelledby="lettersFormTitle">
                     <h2 id="lettersFormTitle" className="visually-hidden">Enter letters to play with:</h2>
                     <Field>

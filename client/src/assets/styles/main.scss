@@ -101,3 +101,13 @@ button:focus-visible {
   white-space: nowrap;
   border: 0;
 }
+
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: block;
+  }
+}
