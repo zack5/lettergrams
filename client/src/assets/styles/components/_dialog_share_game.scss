@@ -1,0 +1,14 @@
+@use "../base/variables";
+
+.share-form {
+    gap: 0.75rem;
+    align-items: flex-start;
+}
+
+.share-url {
+    width: 300px;
+}
+
+.copy-button {
+    width: 100px;
+}

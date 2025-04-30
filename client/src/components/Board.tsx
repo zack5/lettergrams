@@ -32,7 +32,6 @@ export default function Board() {
     useEffect(() => {
         const handleGlobalMove = (e: TouchEvent | MouseEvent) => {
             e.preventDefault();
-            console.log(e);
             if (isDragging) {
                 if (window.TouchEvent && e instanceof window.TouchEvent) {
                     if (e.touches.length > 0) {

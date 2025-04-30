@@ -5,12 +5,14 @@ import { Description, Dialog, DialogPanel, DialogTitle } from '@headlessui/react
 
 import { ContextNavigation } from "../contexts/ContextNavigation";
 
+import { DialogBox } from "../types/DialogBox"
+
 export default function DialogExitGame() {
     const navigate = useNavigate();
-    const { dialogIsOpen, setDialogIsOpen } = useContext(ContextNavigation);
+    const { dialogBox, setDialogBox } = useContext(ContextNavigation);
 
     const handleClose = () => {
-        setDialogIsOpen(false);
+        setDialogBox(null);
     }
     const handleExit = () => {
         handleClose();
@@ -19,7 +21,7 @@ export default function DialogExitGame() {
 
     return (
         <Dialog
-            open={dialogIsOpen}
+            open={dialogBox === DialogBox.ExitGame}
             onClose={handleClose}
             className="dialog-container"
         >

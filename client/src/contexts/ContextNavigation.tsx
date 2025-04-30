@@ -4,6 +4,7 @@ import { isEqual } from 'lodash';
 import { GRID_SIZE, UNDO_LIMIT } from '../constants/Constants';
 
 import { LetterRuntime } from '../types/LetterRuntime';
+import { DialogBox } from '../types/DialogBox';
 
 import { getCoordsFromPosition, getPositionFromCoords } from '../utils/Utils';
 
@@ -14,8 +15,8 @@ export const ContextNavigation = createContext<{
     setLetterRuntimes: (letterRuntimes: LetterRuntime[] | ((prev: LetterRuntime[]) => LetterRuntime[])) => void;
     selectedLetterIds: string[];
     setSelectedLetterIds: (selectedLetterIds: string[] | ((prev: string[]) => string[])) => void;
-    dialogIsOpen: boolean;
-    setDialogIsOpen: (dialogIsOpen: boolean | ((prev: boolean) => boolean)) => void;
+    dialogBox: DialogBox;
+    setDialogBox: (dialogBox: DialogBox | ((prev: DialogBox) => DialogBox)) => void;
     windowDimensions: { width: number, height: number }
 }>({
     isDraggingLetters: false,
@@ -24,8 +25,8 @@ export const ContextNavigation = createContext<{
     setLetterRuntimes: () => { },
     selectedLetterIds: [],
     setSelectedLetterIds: () => { },
-    dialogIsOpen: false,
-    setDialogIsOpen: () => { },
+    dialogBox: null,
+    setDialogBox: () => { },
     windowDimensions: { width: 0, height: 0 },
 });
 
@@ -33,7 +34,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
     const [isDraggingLetters, setIsDraggingLetters] = useState<boolean>(false);
     const [letterRuntimes, setLetterRuntimes] = useState<LetterRuntime[]>([]);
     const [selectedLetterIds, setSelectedLetterIds] = useState<string[]>([]);
-    const [dialogIsOpen, setDialogIsOpen] = useState<boolean>(false);
+    const [dialogBox, setDialogBox] = useState<DialogBox>(null);
     const [mousePosition, setMousePosition] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
 
     const [stacks, setStacks] = useState<{
@@ -417,8 +418,8 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
             setLetterRuntimes,
             selectedLetterIds,
             setSelectedLetterIds,
-            dialogIsOpen,
-            setDialogIsOpen,
+            dialogBox,
+            setDialogBox,
             windowDimensions,
         }}>
             {children}
