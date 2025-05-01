@@ -1,14 +1,17 @@
 import { createContext, useState, useEffect, useRef } from 'react';
 import { isEqual } from 'lodash';
 
-import { GRID_SIZE, UNDO_LIMIT } from '../constants/Constants';
+import { GRID_BOUNDS, GRID_SIZE, UNDO_LIMIT } from '../constants/Constants';
 
 import { LetterRuntime } from '../types/LetterRuntime';
 import { DialogBox } from '../types/DialogBox';
+import { Position } from '../types/Vector2';
 
 import { getCoordsFromPosition, getPositionFromCoords } from '../utils/Utils';
 
 export const ContextNavigation = createContext<{
+    scroll: Position;
+    setScroll: (scroll: Position | ((prev: Position) => Position)) => void;
     isDraggingLetters: boolean;
     setIsDraggingLetters: (isDraggingLetters: boolean | ((prev: boolean) => boolean)) => void;
     letterRuntimes: LetterRuntime[];
@@ -19,6 +22,8 @@ export const ContextNavigation = createContext<{
     setDialogBox: (dialogBox: DialogBox | ((prev: DialogBox) => DialogBox)) => void;
     windowDimensions: { width: number, height: number }
 }>({
+    scroll: { x: 0, y: 0 },
+    setScroll: () => { },
     isDraggingLetters: false,
     setIsDraggingLetters: () => { },
     letterRuntimes: [],
@@ -31,12 +36,12 @@ export const ContextNavigation = createContext<{
 });
 
 export function ContextNavigationProvider({ children }: { children: React.ReactNode }) {
+    const [scroll, setScroll] = useState<Position>({ x: 0, y: 0 });
     const [isDraggingLetters, setIsDraggingLetters] = useState<boolean>(false);
     const [letterRuntimes, setLetterRuntimes] = useState<LetterRuntime[]>([]);
     const [selectedLetterIds, setSelectedLetterIds] = useState<string[]>([]);
     const [dialogBox, setDialogBox] = useState<DialogBox>(null);
-    const [mousePosition, setMousePosition] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
-
+    const [mousePosition, setMousePosition] = useState<Position>({ x: 0, y: 0 });
     const [stacks, setStacks] = useState<{
         undo: LetterRuntime[][];
         redo: LetterRuntime[][];
@@ -205,8 +210,8 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                     selectedLetterIds.forEach(id => {
                         const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === id);
                         if (runtimeIndex !== -1) {
-                            const l1Distance = Math.abs(newLetterRuntimes[runtimeIndex].positionWhileDragging.x - mousePosition.x + offset)
-                                + Math.abs(newLetterRuntimes[runtimeIndex].positionWhileDragging.y - mousePosition.y + offset);
+                            const l1Distance = Math.abs(newLetterRuntimes[runtimeIndex].positionWhileDragging.x - mousePosition.x + scroll.x + offset)
+                                + Math.abs(newLetterRuntimes[runtimeIndex].positionWhileDragging.y - mousePosition.y + scroll.y + offset);
                             if (l1Distance < closestDistance) {
                                 closestDistance = l1Distance;
                                 closestIndex = runtimeIndex;
@@ -254,7 +259,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [stacks, isDraggingLetters, selectedLetterIds, mousePosition]);
+    }, [stacks, isDraggingLetters, selectedLetterIds, mousePosition, scroll]);
 
     useEffect(() => {
         const handleGlobalMouseUp = () => {
@@ -272,8 +277,8 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                 prev.forEach(letterRuntime => {
                     if (selectedLetterIds.includes(letterRuntime.id)) {
                         const pos = getPositionFromCoords(getCoordsFromPosition(letterRuntime.positionWhileDragging));
-                        if (pos.x < 0 || pos.x > windowDimensions.width
-                            || pos.y < 0 || pos.y > windowDimensions.height
+                        if (pos.x < -GRID_SIZE * GRID_BOUNDS || pos.x > GRID_SIZE * GRID_BOUNDS
+                            || pos.y < -GRID_SIZE * GRID_BOUNDS || pos.y > GRID_SIZE * GRID_BOUNDS
                         ) {
                             allInBounds = false;
                         }
@@ -412,6 +417,8 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
 
     return (
         <ContextNavigation.Provider value={{
+            scroll,
+            setScroll,
             isDraggingLetters,
             setIsDraggingLetters,
             letterRuntimes,

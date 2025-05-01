@@ -7,7 +7,8 @@ export default function Controls({children, name, corner} : {children?: ReactNod
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <button
+        <div
+            role="button"
             className={`in-game-text-container ${corner}`}
             onClick={() => setIsOpen(!isOpen)}>
             <span className="panel-header" style={{flexDirection: corner.includes("left") ? "row-reverse" : "row"}}>
@@ -32,6 +33,6 @@ export default function Controls({children, name, corner} : {children?: ReactNod
                     {children}
                 </motion.div>
             </motion.div>
-        </button>
+        </div>
     )
 }

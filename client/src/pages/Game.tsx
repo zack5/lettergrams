@@ -12,8 +12,9 @@ import { ContextNavigation } from "../contexts/ContextNavigation";
 import { LetterRuntime } from "../types/LetterRuntime";
 import { Coordinate } from "../types/Vector2";
 import { getPositionFromCoords } from "../utils/Utils";
+import { GRID_SIZE } from "../constants/Constants";
 
-export default function Game({letters : propLetters}: {letters?: string}) {
+export default function Game({ letters: propLetters }: { letters?: string }) {
     function filterAlphaOnly(input: string): string {
         return input.replace(/[^A-Za-z]/g, '');
     }
@@ -24,14 +25,13 @@ export default function Game({letters : propLetters}: {letters?: string}) {
     const [searchParams, _] = useSearchParams();
     const setup = searchParams.get('setup')
 
-    const { setLetterRuntimes } = useContext(ContextNavigation);
-    
+    const { setLetterRuntimes, setScroll, windowDimensions } = useContext(ContextNavigation);
+
     useEffect(() => {
         let coords: Coordinate[] = []
         if (setup) {
             coords = setup.split(';').map((value) => {
                 const split = value.split(',');
-                console.log(split)
                 if (split.length === 2) {
                     const row = Number(split[0]);
                     const col = Number(split[1])
@@ -39,7 +39,7 @@ export default function Game({letters : propLetters}: {letters?: string}) {
                         return {
                             row,
                             col,
-                        } 
+                        }
                     }
                 }
                 return undefined
@@ -58,16 +58,44 @@ export default function Game({letters : propLetters}: {letters?: string}) {
             col++;
         }
 
-        console.log(setup?.split(';').filter(value => !!value), coords)
-        
-        const letterRuntimes: LetterRuntime[] = letters.toUpperCase().split('').map((letter, index) => ({
-            id: index.toString(),
-            row: coords ? coords[index].row : 0,
-            col: coords ? coords[index].col : index,
-            letter: letter,
-            positionWhileDragging: getPositionFromCoords(0, index),
-        }));
+        const letterRuntimes: LetterRuntime[] = letters.toUpperCase().split('').map((letter, index) => {
+
+            const row = coords ? coords[index].row : 0;
+            const col = coords ? coords[index].col : index;
+            return {
+                id: index.toString(),
+                row,
+                col,
+                letter: letter,
+                positionWhileDragging: getPositionFromCoords(row, col),
+            }
+        });
         setLetterRuntimes(letterRuntimes);
+
+        const { minRow, maxRow, minCol, maxCol } = letterRuntimes.reduce(
+            (acc, runtime) => {
+                acc.minRow = Math.min(acc.minRow, runtime.row);
+                acc.maxRow = Math.max(acc.maxRow, runtime.row);
+                acc.minCol = Math.min(acc.minCol, runtime.col);
+                acc.maxCol = Math.max(acc.maxCol, runtime.col);
+                return acc;
+            },
+            {
+                minRow: Infinity,
+                maxRow: -Infinity,
+                minCol: Infinity,
+                maxCol: -Infinity
+            }
+        );
+
+        const centerRow = (minRow + maxRow) / 2 + 1;
+        const centerCol = (minCol + maxCol) / 2;
+        console.log(centerCol, centerRow);
+
+        setScroll({
+            x: windowDimensions.width / 2 - GRID_SIZE * centerCol,
+            y: windowDimensions.height / 2 - GRID_SIZE * centerRow,
+        })
     }, [letters, setup]);
 
     const letterElements = letters.split('').map((_, index) => (

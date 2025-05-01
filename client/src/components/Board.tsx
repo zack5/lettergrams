@@ -4,14 +4,37 @@ import DragBounds from './DragBounds';
 
 import { ContextNavigation } from '../contexts/ContextNavigation';
 
-import { GRID_SIZE } from '../constants/Constants';
+import { GRID_BOUNDS, GRID_SIZE } from '../constants/Constants';
 
 export default function Board() {
-    const { windowDimensions } = useContext(ContextNavigation);
+    const { windowDimensions, scroll, setScroll } = useContext(ContextNavigation);
 
     const [isDragging, setIsDragging] = useState(false);
     const [startPosition, setStartPosition] = useState({ x: -1, y: -1 });
     const [currentPosition, setCurrentPosition] = useState({ x: -1, y: -1 });
+    const [isSpacePressed, setIsSpacePressed] = useState(false);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.code === 'Space') {
+                setIsSpacePressed(true);
+            }
+        };
+
+        const handleKeyUp = (e: KeyboardEvent) => {
+            if (e.code === 'Space') {
+                setIsSpacePressed(false);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+    }, []);
 
     useEffect(() => {
         const handleGlobalEnd = () => {
@@ -47,6 +70,10 @@ export default function Board() {
                     });
                 }
             }
+
+            if (isSpacePressed && e instanceof MouseEvent) {
+                setScroll(prev => ({ x: prev.x + e.movementX, y: prev.y + e.movementY }))
+            }
         };
 
         window.addEventListener('mousemove', handleGlobalMove);
@@ -56,7 +83,7 @@ export default function Board() {
             window.removeEventListener('mousemove', handleGlobalMove);
             window.removeEventListener('touchmove', handleGlobalMove);
         };
-    }, [isDragging]);
+    }, [isDragging, isSpacePressed]);
 
     const handlePressStart = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
         let clientX: number;
@@ -82,17 +109,56 @@ export default function Board() {
     const verticalLines = [];
     const horizontalLines = [];
 
-    for (let x = GRID_SIZE; x <= windowDimensions.width; x += GRID_SIZE) {
+    const xOffset = scroll.x % GRID_SIZE;
+    for (let x = xOffset; x <= windowDimensions.width; x += GRID_SIZE) {
         verticalLines.push(
             <div key={`v-${x}`} className="grid-line vertical" style={{ left: x }} />
         );
     }
 
-    for (let y = GRID_SIZE; y <= windowDimensions.height; y += GRID_SIZE) {
+    const yOffset = scroll.y % GRID_SIZE;
+    for (let y = yOffset; y <= windowDimensions.height; y += GRID_SIZE) {
         horizontalLines.push(
             <div key={`h-${y}`} className="grid-line horizontal" style={{ top: y }} />
         );
     }
+
+    const outOfBounds = [];
+    const { width, height } = windowDimensions;
+    const border = GRID_SIZE * (GRID_BOUNDS + 1);
+
+    // Right overlay
+    let value = width - border - scroll.x;
+    if (value > 0) {
+        outOfBounds.push(
+            <div className="out-of-bounds" style={{ right: 0, height, width: value }} />
+        )
+    };
+
+    // Left overlay
+    value = -border + GRID_SIZE + scroll.x;
+    if (value > 0) {
+        outOfBounds.push(
+            <div className="out-of-bounds" style={{ left: 0, height, width: value }} />
+        )
+    };
+
+    // Top overlay
+    value = -border + GRID_SIZE + scroll.y;
+    if (value > 0) {
+        outOfBounds.push(
+            <div className="out-of-bounds" style={{ top: 0, height: value, width }} />
+        )
+    };
+
+    // Bottom overlay
+    value = height - border - scroll.y;
+    if (value > 0) {
+        outOfBounds.push(
+            <div className="out-of-bounds" style={{ bottom: 0, height: value, width }} />
+        )
+    };
+
 
     return (
         <div
@@ -102,6 +168,7 @@ export default function Board() {
         >
             {verticalLines}
             {horizontalLines}
+            {outOfBounds}
             {<DragBounds
                 isDragging={isDragging}
                 startPosition={startPosition}

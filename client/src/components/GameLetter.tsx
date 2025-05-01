@@ -1,6 +1,6 @@
 import { useEffect, useContext } from "react";
 
-import { useMotionValue, useTransform } from "framer-motion";
+import { useMotionValue, MotionValue, useTransform } from "framer-motion";
 
 import Letter from "../components/Letter";
 
@@ -11,7 +11,7 @@ import { ContextNavigation } from "../contexts/ContextNavigation";
 import { getPositionFromCoords } from "../utils/Utils";
 
 export default function GameLetter({ id }: { id: string }) {
-    const { isDraggingLetters, setIsDraggingLetters, letterRuntimes, selectedLetterIds, setSelectedLetterIds } = useContext(ContextNavigation);
+    const { scroll, isDraggingLetters, setIsDraggingLetters, letterRuntimes, selectedLetterIds, setSelectedLetterIds } = useContext(ContextNavigation);
 
     const runtime = letterRuntimes.find((letter) => letter.id === id);
     const letter = runtime?.letter || '';
@@ -28,57 +28,63 @@ export default function GameLetter({ id }: { id: string }) {
         let lastTime = performance.now();
         const threshold = 1;
         const speed = 12; // units per second
-      
+
         const animate = (time: number) => {
-          const deltaTime = (time - lastTime) / 1000; // seconds
-          lastTime = time;
-      
-          if (updateImmediately) {
-            x.set(dragPosition.x);
-            y.set(dragPosition.y);
-          } else {
-            const currentX = x.get();
-            const currentY = y.get();
-            const deltaX = boardPosition.x - currentX;
-            const deltaY = boardPosition.y - currentY;
-      
-            if (Math.abs(deltaX) < threshold && Math.abs(deltaY) < threshold) {
-              x.set(boardPosition.x);
-              y.set(boardPosition.y);
-              return;
+            const deltaTime = (time - lastTime) / 1000; // seconds
+            lastTime = time;
+
+            if (updateImmediately) {
+                x.set(dragPosition.x);
+                y.set(dragPosition.y);
+            } else {
+                const currentX = x.get();
+                const currentY = y.get();
+                const deltaX = boardPosition.x - currentX;
+                const deltaY = boardPosition.y - currentY;
+
+                if (Math.abs(deltaX) < threshold && Math.abs(deltaY) < threshold) {
+                    x.set(boardPosition.x);
+                    y.set(boardPosition.y);
+                    return;
+                }
+
+                const moveX = deltaX * Math.min(1, speed * deltaTime);
+                const moveY = deltaY * Math.min(1, speed * deltaTime);
+
+                x.set(currentX + moveX);
+                y.set(currentY + moveY);
+
+                animationFrameId = requestAnimationFrame(animate);
             }
-      
-            const moveX = deltaX * Math.min(1, speed * deltaTime);
-            const moveY = deltaY * Math.min(1, speed * deltaTime);
-      
-            x.set(currentX + moveX);
-            y.set(currentY + moveY);
-      
-            animationFrameId = requestAnimationFrame(animate);
-          }
         };
-      
+
         animationFrameId = requestAnimationFrame(animate);
-      
+
         return () => cancelAnimationFrame(animationFrameId);
-      }, [dragPosition, boardPosition, x, y, updateImmediately]);
-      
+    }, [dragPosition, boardPosition, x, y, updateImmediately]);
 
-    const backgroundPosition = useTransform([x, y], ([latestX, latestY]) => {
-        return `-${latestX}px -${latestY}px`;
-    });
 
-    const onPressStart = (event : TouchEvent | MouseEvent) => {
+    const backgroundPosition = useTransform(
+        [x, y] as [MotionValue<number>, MotionValue<number>],
+        (values) => {
+            const [latestX, latestY] = values as [number, number];
+            return `-${latestX + scroll.x}px -${latestY + scroll.y}px`;
+        }
+    );
+
+
+
+    const onPressStart = (event: TouchEvent | MouseEvent) => {
         event.preventDefault();
         if ('shiftKey' in event && event.shiftKey) {
-            setSelectedLetterIds(prev => 
-                prev.includes(id) 
+            setSelectedLetterIds(prev =>
+                prev.includes(id)
                     ? prev.filter(existingId => existingId !== id)
                     : [...prev, id]
             );
         } else if ('metaKey' in event && (event.metaKey || event.ctrlKey)) {
             setSelectedLetterIds(prev => [...prev, id]);
-        } else { 
+        } else {
             setSelectedLetterIds(prev => isSelected ? prev : [id]);
         }
         setIsDraggingLetters(true);
@@ -95,14 +101,14 @@ export default function GameLetter({ id }: { id: string }) {
                     width: GRID_SIZE,
                     height: GRID_SIZE,
                     position: 'absolute',
-                    top: 0,
-                    left: 0,
+                    top: scroll.y,
+                    left: scroll.x,
                     backgroundPosition,
                     backgroundSize: '100vw 100vh',
                 },
                 onMouseDown: onPressStart,
                 onTouchStart: onPressStart,
-                }
+            }
             }
         />
     );

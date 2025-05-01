@@ -13,7 +13,7 @@ type DragBoundsProps = {
 };
 
 export default function DragBounds({ isDragging, startPosition, currentPosition }: DragBoundsProps) {
-    const { letterRuntimes, setSelectedLetterIds } = useContext(ContextNavigation);
+    const { scroll, letterRuntimes, setSelectedLetterIds } = useContext(ContextNavigation);
 
     const width = Math.abs(currentPosition.x - startPosition.x);
     const height = Math.abs(currentPosition.y - startPosition.y);
@@ -25,8 +25,8 @@ export default function DragBounds({ isDragging, startPosition, currentPosition 
             return;
         }
 
-        const l1 = { x: left, y: top };
-        const r1 = { x: left + width, y: top + height };
+        const l1 = { x: left - scroll.x, y: top - scroll.y };
+        const r1 = { x: left + width - scroll.x, y: top + height - scroll.y };
 
         const selectedLetterIds = letterRuntimes.filter((letter) => {
             const l2 = getPositionFromCoords(letter.row, letter.col);

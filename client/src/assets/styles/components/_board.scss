@@ -23,3 +23,8 @@
     right: 0;
     height: 1px;
 }
+
+.out-of-bounds {
+  position: absolute;
+  background-color: variables.$color-background-1;
+}
