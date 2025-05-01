@@ -16,7 +16,7 @@ export default function Controls({children, name, corner} : {children?: ReactNod
                     animate={{ rotate: isOpen ? 180 : 0 }}
                     transition={{ type: "linear" }}
                 >
-                    ▼
+                    ▲
                 </motion.span>
             </span>
             <motion.div

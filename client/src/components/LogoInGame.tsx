@@ -18,19 +18,19 @@ export default function LogoInGame() {
                     className="panel-button"
                     onClick={(e) => {
                         e.stopPropagation();
-                        setDialogBox(DialogBox.ExitGame);
+                        setDialogBox(DialogBox.ShareGame);
                     }}
                 >
-                    <IoMdExit /><span>Exit</span>
+                    <IoMdExit /><span>Share Board</span>
                 </button>
                 <button
                     className="panel-button"
                     onClick={(e) => {
                         e.stopPropagation();
-                        setDialogBox(DialogBox.ShareGame);
+                        setDialogBox(DialogBox.ExitGame);
                     }}
                 >
-                    <IoMdShare /><span>Share Board</span>
+                    <IoMdShare /><span>Exit</span>
                 </button>
             </div>
 
