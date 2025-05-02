@@ -28,3 +28,7 @@
   position: absolute;
   background-color: variables.$color-background-1;
 }
+
+.board.moving {
+  cursor: move;
+}

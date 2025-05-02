@@ -162,7 +162,7 @@ export default function Board() {
 
     return (
         <div
-            className="board"
+            className={`board ${isSpacePressed ? 'moving' : ''}`}
             onMouseDown={handlePressStart}
             onTouchStart={handlePressStart}
         >
