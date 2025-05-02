@@ -9,7 +9,7 @@ export default function Controls({children, name, corner} : {children?: ReactNod
     return (
         <div
             role="button"
-            className={`in-game-text-container ${corner}`}
+            className={`in-game-text-container collapsible-panel ${corner}`}
             onClick={() => setIsOpen(!isOpen)}>
             <span className="panel-header" style={{flexDirection: corner.includes("left") ? "row-reverse" : "row"}}>
                 <h3 style={{ margin: 0 }}>{name}</h3>

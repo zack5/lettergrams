@@ -7,6 +7,7 @@
 @use "./components/dialog_share_game";
 @use "./components/document_page";
 @use "./components/drag_bounds";
+@use "./components/game_letter_shelf";
 @use "./components/letter";
 @use "./components/letter_header";
 @use "./components/off_screen_pointer";
@@ -64,6 +65,10 @@ p {
   margin-block: 0rem;
 }
 
+button {
+  background-color: variables.$color-background-1;
+}
+
 button,
 div[role="button"] {
   border-radius: 8px;
@@ -72,7 +77,6 @@ div[role="button"] {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: variables.$color-background-1;
   cursor: pointer;
   transition: border-color 0.25s;
 }

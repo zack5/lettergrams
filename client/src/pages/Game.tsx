@@ -6,14 +6,15 @@ import Controls from "../components/Controls";
 import DialogExitGame from "../components/DialogExitGame";
 import DialogShareGame from "../components/DialogShareGame";
 import GameLetter from "../components/GameLetter";
+import GameLetterShelf from "../components/GameLetterShelf";
 import LogoInGame from "../components/LogoInGame";
+import OffScreenPointer from "../components/OffScreenPointer";
 
 import { ContextNavigation } from "../contexts/ContextNavigation";
 import { LetterRuntime } from "../types/LetterRuntime";
 import { Coordinate } from "../types/Vector2";
 import { getPositionFromCoords } from "../utils/Utils";
 import { GRID_SIZE } from "../constants/Constants";
-import OffScreenPointer from "../components/OffScreenPointer";
 
 export default function Game({ letters: propLetters }: { letters?: string }) {
     function filterAlphaOnly(input: string): string {
@@ -111,6 +112,7 @@ export default function Game({ letters: propLetters }: { letters?: string }) {
             <Board />
             {letterElements}
             {offScreenPointers}
+            {/* <GameLetterShelf /> */}
             <Controls />
             <LogoInGame />
             <DialogExitGame />

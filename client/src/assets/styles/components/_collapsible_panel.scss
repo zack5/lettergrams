@@ -1,6 +1,12 @@
 @use 'sass:color';
 @use "../base/variables";
 
+div.collapsible-panel {
+  margin: 0;
+  padding-block: 0.5rem;
+  padding-inline: 1rem;
+}
+
 .panel-header {
   display: flex;
   flex-direction: row;

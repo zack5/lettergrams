@@ -1,0 +1,8 @@
+@use "../base/variables";
+
+.game-letter-shelf {
+    bottom: 2rem;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    z-index: variables.$z-index-shelf;
+}
