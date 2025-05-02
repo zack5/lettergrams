@@ -15,6 +15,7 @@ export default function GameLetter({ id }: { id: string }) {
 
     const runtime = letterRuntimes.find((letter) => letter.id === id);
     const letter = runtime?.letter || '';
+    const isShelved = runtime?.isShelved;
     const isSelected = selectedLetterIds.includes(id);
     const updateImmediately = isDraggingLetters && isSelected;
     const dragPosition = runtime?.positionWhileDragging || { x: 0, y: 0 };
@@ -93,7 +94,7 @@ export default function GameLetter({ id }: { id: string }) {
     return (
         <Letter
             letter={letter}
-            extraClasses={`interactive ${isSelected ? 'selected' : ''}`}
+            extraClasses={`interactive ${isSelected ? 'selected' : ''} ${isShelved ? 'shelved' : ''}`}
             props={{
                 style: {
                     x,

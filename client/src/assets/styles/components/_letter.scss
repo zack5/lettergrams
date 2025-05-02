@@ -21,13 +21,11 @@
         z-index: 2;
     }
 
+    &.shelved {
+        z-index: variables.$z-index-shelf + 2;
+    }
+
     &.interactive {
         cursor: pointer;
     }
-}
-
-.letter.shadow {
-    box-shadow: 1px 2px 4px rgba(0,0,0, 0.99);
-    z-index: 0;
-    background-color: none;
 }

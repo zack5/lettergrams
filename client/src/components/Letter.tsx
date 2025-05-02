@@ -19,9 +19,7 @@ export default function Letter({ letter, extraClasses, props }: LetterProps) {
                 }}
                 {...props}
             >
-                <div className='shadow'>
                 {letter}
-                </div>
             </motion.div>
         </>
     );

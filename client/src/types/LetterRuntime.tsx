@@ -1,7 +1,8 @@
 export interface LetterRuntime {
     id: string;
+    letter: string;
+    isShelved: boolean;
     row: number;
     col: number;
-    letter: string;
     positionWhileDragging: { x: number; y: number };
 }
