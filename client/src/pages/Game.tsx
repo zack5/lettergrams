@@ -13,6 +13,7 @@ import { LetterRuntime } from "../types/LetterRuntime";
 import { Coordinate } from "../types/Vector2";
 import { getPositionFromCoords } from "../utils/Utils";
 import { GRID_SIZE } from "../constants/Constants";
+import OffScreenPointer from "../components/OffScreenPointer";
 
 export default function Game({ letters: propLetters }: { letters?: string }) {
     function filterAlphaOnly(input: string): string {
@@ -25,7 +26,7 @@ export default function Game({ letters: propLetters }: { letters?: string }) {
     const [searchParams, _] = useSearchParams();
     const setup = searchParams.get('setup')
 
-    const { setLetterRuntimes, setScroll, windowDimensions } = useContext(ContextNavigation);
+    const { letterRuntimes, setLetterRuntimes, setScroll, windowDimensions } = useContext(ContextNavigation);
 
     useEffect(() => {
         let coords: Coordinate[] = []
@@ -102,10 +103,15 @@ export default function Game({ letters: propLetters }: { letters?: string }) {
         <GameLetter key={index} id={index.toString()} />
     ));
 
+    const offScreenPointers = letterRuntimes.map((runtime, index) => (
+        <OffScreenPointer runtime={runtime} key={index}/>
+    ));
+
     return (
         <main className="game">
             <Board />
             {letterElements}
+            {offScreenPointers}
             <Controls />
             <LogoInGame />
             <DialogExitGame />
