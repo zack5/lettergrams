@@ -46,7 +46,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
     const [letterRuntimes, setLetterRuntimes] = useState<LetterRuntime[]>([]);
     const [selectedLetterIds, setSelectedLetterIds] = useState<string[]>([]);
     const [dialogBox, setDialogBox] = useState<DialogBox>(null);
-    const [mousePosition, setMousePosition] = useState<Position>({ x: 0, y: 0 });
+    const [mousePosition, setMousePosition] = useState<Position>({ x: window.innerWidth/2, y: window.innerHeight/2 });
     const [stacks, setStacks] = useState<{
         undo: LetterRuntime[][];
         redo: LetterRuntime[][];
@@ -148,6 +148,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                         return {
                             ...runtime,
                             isShelved: false,
+                            startedDragFromShelf: runtime.isShelved || runtime.startedDragFromShelf,
                             positionWhileDragging: {
                                 x: startingPos.x + movementX,
                                 y: startingPos.y + movementY,
@@ -241,6 +242,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                             const updatedRuntime = {
                                 ...runtime,
                                 isShelved: false,
+                                startedDragFromShelf: true,
                                 positionWhileDragging,
                             }
 
@@ -318,6 +320,9 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
             setIsDraggingLetters(false);
             setIsTypingFromShelf(false);
 
+            if (!isDraggingLetters)
+                return;
+
             // Resolve placement
             setLetterRuntimes(prev => {
                 if (selectedLetterIds.length <= 0) {
@@ -363,7 +368,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                     const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === id);
                     if (runtimeIndex !== -1) {
                         const runtime = newLetterRuntimes[runtimeIndex];
-                        return { row: runtime.row, col: runtime.col, isShelved: isTypingFromShelf /* THIS IS WRONG */ };
+                        return { row: runtime.row, col: runtime.col, isShelved: runtime.startedDragFromShelf || runtime.isShelved };
                     }
                     return { row: -1, col: -1, isShelved: false };
                 });
@@ -431,6 +436,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                             row: targetRow,
                             col: targetCol,
                             isShelved: freedSpaces[i].isShelved,
+                            startedDragFromShelf: false,
                             positionWhileDragging: getPositionFromCoords(targetRow, targetCol),
                         }
 
@@ -453,6 +459,8 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                             ...runtime,
                             row: targetRow,
                             col: targetCol,
+                            isShelved: false, // TODO: not always true
+                            startedDragFromShelf: false,
                             positionWhileDragging: getPositionFromCoords(targetRow, targetCol),
                         }
 

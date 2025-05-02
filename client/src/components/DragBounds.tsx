@@ -29,6 +29,9 @@ export default function DragBounds({ isDragging, startPosition, currentPosition 
         const r1 = { x: left + width - scroll.x, y: top + height - scroll.y };
 
         const selectedLetterIds = letterRuntimes.filter((letter) => {
+            if (letter.isShelved)
+                return;
+            
             const l2 = getPositionFromCoords(letter.row, letter.col);
             const r2 = {x: l2.x + GRID_SIZE, y: l2.y + GRID_SIZE};
 

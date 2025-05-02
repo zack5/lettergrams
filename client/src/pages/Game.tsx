@@ -67,6 +67,7 @@ export default function Game({ letters: propLetters }: { letters?: string }) {
                 id: index.toString(),
                 letter: letter,
                 isShelved: true,
+                startedDragFromShelf: false,
                 row,
                 col,
                 positionWhileDragging: getScreenPositionFromShelf(col, windowDimensions, coords.length),

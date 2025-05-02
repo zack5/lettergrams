@@ -11,7 +11,7 @@ import { ContextNavigation } from "../contexts/ContextNavigation";
 import { getPositionFromCoords, getScreenPositionFromShelf, getShelvedLetterCount } from "../utils/Utils";
 
 export default function GameLetter({ id }: { id: string }) {
-    const { scroll, isDraggingLetters, setIsDraggingLetters, isTypingFromShelf, letterRuntimes, selectedLetterIds, setSelectedLetterIds, windowDimensions } = useContext(ContextNavigation);
+    const { scroll, isDraggingLetters, setIsDraggingLetters, isTypingFromShelf, letterRuntimes, setLetterRuntimes, selectedLetterIds, setSelectedLetterIds, windowDimensions } = useContext(ContextNavigation);
 
     const runtime = letterRuntimes.find((letter) => letter.id === id);
     const letter = runtime?.letter || '';
@@ -26,7 +26,7 @@ export default function GameLetter({ id }: { id: string }) {
     const y = useMotionValue(boardPosition.y);
     const top = useMotionValue(0);
     const left = useMotionValue(0);
-    const [lastAnimationIsShelved, setLastAnimationIsShelved] = useState(true);
+    const [_, forceRerender] = useState(true); // Hack
 
     useEffect(() => {
         let animationFrameId: number;
@@ -79,7 +79,7 @@ export default function GameLetter({ id }: { id: string }) {
                 
                 animationFrameId = requestAnimationFrame(animate);
             }
-            setLastAnimationIsShelved(isShelved);
+            forceRerender(true);
         };
 
         animationFrameId = requestAnimationFrame(animate);
@@ -137,6 +137,8 @@ export default function GameLetter({ id }: { id: string }) {
                     left,
                     backgroundPosition,
                     backgroundSize: '100vw 100vh',
+                    borderTopLeftRadius: isShelved ? 0 : 10,
+                    borderTopRightRadius: runtime?.startedDragFromShelf ? 0 : 10,
                 },
                 onMouseDown: onPressStart,
                 onTouchStart: onPressStart,
