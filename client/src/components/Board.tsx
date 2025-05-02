@@ -85,6 +85,22 @@ export default function Board() {
         };
     }, [isDragging, isSpacePressed]);
 
+    useEffect(() => {
+        const handleWheel = (e: WheelEvent) => {
+            e.preventDefault();
+            setScroll(prev => ({
+                x: prev.x - e.deltaX,
+                y: prev.y - e.deltaY
+            }));
+        };
+    
+        window.addEventListener('wheel', handleWheel, { passive: false });
+    
+        return () => {
+            window.removeEventListener('wheel', handleWheel);
+        };
+    }, []);  
+
     const handlePressStart = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
         let clientX: number;
         let clientY: number;

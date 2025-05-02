@@ -91,7 +91,6 @@ export default function Game({ letters: propLetters }: { letters?: string }) {
 
         const centerRow = (minRow + maxRow) / 2 + 1;
         const centerCol = (minCol + maxCol) / 2;
-        console.log(centerCol, centerRow);
 
         setScroll({
             x: windowDimensions.width / 2 - GRID_SIZE * centerCol,
