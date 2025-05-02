@@ -7,7 +7,7 @@ import { ContextNavigation } from '../contexts/ContextNavigation';
 import { GRID_BOUNDS, GRID_SIZE } from '../constants/Constants';
 
 export default function Board() {
-    const { windowDimensions, scroll, setScroll } = useContext(ContextNavigation);
+    const { windowDimensions, setLetterRuntimes, scroll, setScroll, isTypingFromShelf, selectedLetterIds } = useContext(ContextNavigation);
 
     const [isDragging, setIsDragging] = useState(false);
     const [startPosition, setStartPosition] = useState({ x: -1, y: -1 });
@@ -52,6 +52,25 @@ export default function Board() {
         };
     }, []);
 
+    const updateActiveLetters = (deltaX: number, deltaY: number) => {
+        setLetterRuntimes(prev => {
+            const newLetterRuntimes = [...prev].map(runtime => {
+                if (!selectedLetterIds.includes(runtime.id))
+                    return runtime;
+
+                return {
+                    ...runtime,
+                    positionWhileDragging: {
+                        x: runtime.positionWhileDragging.x + (isTypingFromShelf ? 1 : -1) * deltaX,
+                        y: runtime.positionWhileDragging.y + (isTypingFromShelf ? 1 : -1) * deltaY,
+                    }
+                }
+            });
+
+            return newLetterRuntimes;
+        });
+    }
+
     useEffect(() => {
         const handleGlobalMove = (e: TouchEvent | MouseEvent) => {
             e.preventDefault();
@@ -73,6 +92,7 @@ export default function Board() {
 
             if (isSpacePressed && e instanceof MouseEvent) {
                 setScroll(prev => ({ x: prev.x + e.movementX, y: prev.y + e.movementY }))
+                updateActiveLetters(e.movementX, e.movementY)
             }
         };
 
@@ -83,7 +103,7 @@ export default function Board() {
             window.removeEventListener('mousemove', handleGlobalMove);
             window.removeEventListener('touchmove', handleGlobalMove);
         };
-    }, [isDragging, isSpacePressed]);
+    }, [isDragging, isSpacePressed, isTypingFromShelf, selectedLetterIds]);
 
     useEffect(() => {
         const handleWheel = (e: WheelEvent) => {
@@ -92,6 +112,7 @@ export default function Board() {
                 x: prev.x - e.deltaX,
                 y: prev.y - e.deltaY
             }));
+            updateActiveLetters(e.deltaX, e.deltaY)
         };
     
         window.addEventListener('wheel', handleWheel, { passive: false });
@@ -99,9 +120,12 @@ export default function Board() {
         return () => {
             window.removeEventListener('wheel', handleWheel);
         };
-    }, []);  
+    }, [isTypingFromShelf, selectedLetterIds]);  
 
     const handlePressStart = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+        if (isTypingFromShelf)
+            return;
+
         let clientX: number;
         let clientY: number;
 

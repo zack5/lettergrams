@@ -1,5 +1,6 @@
-import { GRID_SIZE } from "../constants/Constants";
-import { Coordinate, Position } from "../types/Vector2";
+import { GRID_SIZE, SHELF_BOTTOM_OFFSET, SHELF_PADDING } from "../constants/Constants";
+import { LetterRuntime } from "../types/LetterRuntime";
+import { Coordinate, Position, Size } from "../types/Vector2";
 
 export const getCoordsFromPosition = (
     position: { x: number, y: number }
@@ -28,3 +29,23 @@ export const getPositionFromCoords = (
         throw new Error('Invalid arguments passed to getPositionFromCoords');
     }
 };
+
+export const getScreenPositionFromShelf = (
+    col: number,
+    windowDimensions: Size,
+    shelvedCount: number,
+): Position => {
+    const x = windowDimensions.width/2 -(shelvedCount / 2 - col) * GRID_SIZE;
+    const y = windowDimensions.height - GRID_SIZE - SHELF_BOTTOM_OFFSET - SHELF_PADDING;
+    return { x, y }
+}
+
+export const getShelvedLetterCount = (letterRuntimes: LetterRuntime[]): number => {
+    let result = 0;
+    for (let i = 0; i < letterRuntimes.length; i++) {
+        if (letterRuntimes[i].isShelved) {
+            result++;
+        }
+    }
+    return result;
+}

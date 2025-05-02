@@ -5,13 +5,14 @@ import { LetterRuntime } from "../types/LetterRuntime";
 import { GRID_SIZE } from "../constants/Constants";
 
 export default function OffScreenPointer({ runtime }: { runtime: LetterRuntime }) {
-    const { scroll, windowDimensions } = useContext(ContextNavigation);
+    const { scroll, windowDimensions, selectedLetterIds, isDraggingLetters } = useContext(ContextNavigation);
 
     const buffer = 12;
     const dimension = 15;
     const borderRadius = 75  ;
     const screenX = runtime.col * GRID_SIZE + scroll.x + GRID_SIZE / 2 - dimension / 2;
     const screenY = runtime.row * GRID_SIZE + scroll.y + GRID_SIZE / 2 - dimension / 2;
+    const isDraggingThisLetter = selectedLetterIds.includes(runtime.id) && isDraggingLetters;
 
     function clampToRoundedRect(screenX: number, screenY: number) {
         const minX = buffer;
@@ -54,8 +55,11 @@ export default function OffScreenPointer({ runtime }: { runtime: LetterRuntime }
         return { x, y };
     }
 
-    if (screenX < 0 || screenX > windowDimensions.width
-        || screenY < 0 || screenY > windowDimensions.height
+    if (!(runtime.isShelved || isDraggingThisLetter) &&
+        (
+            screenX < 0 || screenX > windowDimensions.width
+            || screenY < 0 || screenY > windowDimensions.height
+        )
     ) {
         const { x, y } = clampToRoundedRect(screenX, screenY);
 

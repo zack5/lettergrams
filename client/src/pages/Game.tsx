@@ -13,8 +13,7 @@ import OffScreenPointer from "../components/OffScreenPointer";
 import { ContextNavigation } from "../contexts/ContextNavigation";
 import { LetterRuntime } from "../types/LetterRuntime";
 import { Coordinate } from "../types/Vector2";
-import { getPositionFromCoords } from "../utils/Utils";
-import { GRID_SIZE } from "../constants/Constants";
+import { getScreenPositionFromShelf, getShelvedLetterCount } from "../utils/Utils";
 
 export default function Game({ letters: propLetters }: { letters?: string }) {
     function filterAlphaOnly(input: string): string {
@@ -70,33 +69,14 @@ export default function Game({ letters: propLetters }: { letters?: string }) {
                 isShelved: true,
                 row,
                 col,
-                positionWhileDragging: getPositionFromCoords(row, col),
+                positionWhileDragging: getScreenPositionFromShelf(col, windowDimensions, coords.length),
             }
         });
         setLetterRuntimes(letterRuntimes);
 
-        const { minRow, maxRow, minCol, maxCol } = letterRuntimes.reduce(
-            (acc, runtime) => {
-                acc.minRow = Math.min(acc.minRow, runtime.row);
-                acc.maxRow = Math.max(acc.maxRow, runtime.row);
-                acc.minCol = Math.min(acc.minCol, runtime.col);
-                acc.maxCol = Math.max(acc.maxCol, runtime.col);
-                return acc;
-            },
-            {
-                minRow: Infinity,
-                maxRow: -Infinity,
-                minCol: Infinity,
-                maxCol: -Infinity
-            }
-        );
-
-        const centerRow = (minRow + maxRow) / 2 + 1;
-        const centerCol = (minCol + maxCol) / 2 + 0.5;
-
         setScroll({
-            x: windowDimensions.width / 2 - GRID_SIZE * centerCol,
-            y: windowDimensions.height / 2 - GRID_SIZE * centerRow,
+            x: 0,//windowDimensions.width / 2,
+            y: 0//windowDimensions.height / 2,
         })
     }, [letters, setup]);
 
@@ -111,9 +91,9 @@ export default function Game({ letters: propLetters }: { letters?: string }) {
     return (
         <main className="game">
             <Board />
-            {letterElements}
             {offScreenPointers}
-            {/* <GameLetterShelf /> */}
+            {letterElements}
+            <GameLetterShelf />
             <Controls />
             <LogoInGame />
             <DialogExitGame />

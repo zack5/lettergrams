@@ -69,11 +69,11 @@ export default function Controls() {
                 {colgroup}
                 <tbody>
                     <tr>
-                        <td><span className="keybinding">R:</span></td>
+                        <td><span className="keybinding">Tab:</span></td>
                         <td className="panel-name">Rotate <TbRotateClockwise /></td>
                     </tr>
                     <tr>
-                        <td><span className="keybinding"><ImShift />R:</span></td>
+                        <td><span className="keybinding"><ImShift />Tab:</span></td>
                         <td className="panel-name">Rotate <TbRotate /></td>
                     </tr>
                 </tbody>

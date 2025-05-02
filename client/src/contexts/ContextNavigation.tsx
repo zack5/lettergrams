@@ -7,13 +7,15 @@ import { LetterRuntime } from '../types/LetterRuntime';
 import { DialogBox } from '../types/DialogBox';
 import { Position } from '../types/Vector2';
 
-import { getCoordsFromPosition, getPositionFromCoords } from '../utils/Utils';
+import { getCoordsFromPosition, getPositionFromCoords, getScreenPositionFromShelf, getShelvedLetterCount } from '../utils/Utils';
 
 export const ContextNavigation = createContext<{
     scroll: Position;
     setScroll: (scroll: Position | ((prev: Position) => Position)) => void;
     isDraggingLetters: boolean;
     setIsDraggingLetters: (isDraggingLetters: boolean | ((prev: boolean) => boolean)) => void;
+    isTypingFromShelf: boolean;
+    setIsTypingFromShelf: (isDraggingLetters: boolean | ((prev: boolean) => boolean)) => void;
     letterRuntimes: LetterRuntime[];
     setLetterRuntimes: (letterRuntimes: LetterRuntime[] | ((prev: LetterRuntime[]) => LetterRuntime[])) => void;
     selectedLetterIds: string[];
@@ -26,6 +28,8 @@ export const ContextNavigation = createContext<{
     setScroll: () => { },
     isDraggingLetters: false,
     setIsDraggingLetters: () => { },
+    isTypingFromShelf: false,
+    setIsTypingFromShelf: () => { },
     letterRuntimes: [],
     setLetterRuntimes: () => { },
     selectedLetterIds: [],
@@ -38,6 +42,7 @@ export const ContextNavigation = createContext<{
 export function ContextNavigationProvider({ children }: { children: React.ReactNode }) {
     const [scroll, setScroll] = useState<Position>({ x: 0, y: 0 });
     const [isDraggingLetters, setIsDraggingLetters] = useState<boolean>(false);
+    const [isTypingFromShelf, setIsTypingFromShelf] = useState<boolean>(false);
     const [letterRuntimes, setLetterRuntimes] = useState<LetterRuntime[]>([]);
     const [selectedLetterIds, setSelectedLetterIds] = useState<string[]>([]);
     const [dialogBox, setDialogBox] = useState<DialogBox>(null);
@@ -130,10 +135,19 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                     return prev.map(runtime => {
                         if (!selectedLetterIds.includes(runtime.id))
                             return runtime;
-    
-                        const startingPos = runtime.positionWhileDragging;
+
+                        let startingPos;
+                        if (runtime.isShelved) {
+                            startingPos = getScreenPositionFromShelf(runtime.col, windowDimensions, getShelvedLetterCount(prev));
+                            startingPos.x -= scroll.x;
+                            startingPos.y -= scroll.y;
+                        } else {
+                            startingPos = runtime.positionWhileDragging;
+                        }
+
                         return {
                             ...runtime,
+                            isShelved: false,
                             positionWhileDragging: {
                                 x: startingPos.x + movementX,
                                 y: startingPos.y + movementY,
@@ -151,16 +165,18 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
             window.removeEventListener('mousemove', handleMove);
             window.removeEventListener('touchmove', handleMove);
         };
-    }, [isDraggingLetters, selectedLetterIds]);
+    }, [isDraggingLetters, selectedLetterIds, windowDimensions, isTypingFromShelf]);
     
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
+            const key = event.key.toLowerCase();
             const isCtrl = event.ctrlKey || event.metaKey;
             const isShift = event.shiftKey;
-            const isCtrlY = event.key === 'y' && isCtrl;
-            const isCtrlZ = event.key === 'z' && isCtrl;
-            const isShiftZ = event.key === 'z' && isShift;
+            const isCtrlY = key === 'y' && isCtrl;
+            const isCtrlZ = key === 'z' && isCtrl;
+            const isShiftZ = key === 'z' && isShift;
+            const isRotate = key === "tab";
 
             // Undo
             if (isCtrlZ && !isShiftZ) {
@@ -198,6 +214,41 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                     }
                     return prev;
                 });
+            }
+
+            // Typing from shelf
+            if ((!isDraggingLetters || isTypingFromShelf) && key >= 'a' && key <= 'z') {
+                const findMatchingLetter = (runtime: LetterRuntime) => {return runtime.isShelved && (runtime.letter.toLowerCase() === key)}
+                const runtimeIndex = letterRuntimes.findIndex(findMatchingLetter);
+                if (runtimeIndex >= 0) {
+                    setIsDraggingLetters(true);
+                    setIsTypingFromShelf(true);
+
+                    const isFirst = !isTypingFromShelf;
+                    const id = letterRuntimes[runtimeIndex].id;
+                    setSelectedLetterIds(prev => isFirst ? [id] : [...prev, id]);
+                    const selectedLettersLength = isFirst ? 0 : selectedLetterIds.length;
+
+                    setLetterRuntimes(prev => {
+                        const newLetterRuntimes = [...prev];
+                        const runtimeIndex = newLetterRuntimes.findIndex(findMatchingLetter);
+                        if (runtimeIndex >= 0) {
+                            const runtime = newLetterRuntimes[runtimeIndex];
+                            const positionWhileDragging = {
+                                x: mousePosition.x + selectedLettersLength * GRID_SIZE - scroll.x,
+                                y: mousePosition.y - scroll.y,
+                            }
+                            const updatedRuntime = {
+                                ...runtime,
+                                isShelved: false,
+                                positionWhileDragging,
+                            }
+
+                            newLetterRuntimes[runtimeIndex] = updatedRuntime;
+                        }
+                        return newLetterRuntimes
+                    })
+                }
             }
 
             function RotateLetters(clockwise: boolean) {
@@ -251,7 +302,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
             }
 
             // Rotate
-            if (event.key.toLowerCase() === 'r' && isDraggingLetters && selectedLetterIds.length >= 2) {
+            if (isRotate && isDraggingLetters && selectedLetterIds.length >= 2) {
                 event.preventDefault();
                 RotateLetters(!isShift);
             }
@@ -265,6 +316,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
         const handleGlobalMouseUp = () => {
             // Stop dragging
             setIsDraggingLetters(false);
+            setIsTypingFromShelf(false);
 
             // Resolve placement
             setLetterRuntimes(prev => {
@@ -304,15 +356,16 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                 interface GridSpace {
                     row: number;
                     col: number;
+                    isShelved: boolean;
                 }
 
                 const originalSpaces: GridSpace[] = selectedLetterIds.map(id => {
                     const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === id);
                     if (runtimeIndex !== -1) {
                         const runtime = newLetterRuntimes[runtimeIndex];
-                        return { row: runtime.row, col: runtime.col };
+                        return { row: runtime.row, col: runtime.col, isShelved: isTypingFromShelf /* THIS IS WRONG */ };
                     }
-                    return { row: -1, col: -1 };
+                    return { row: -1, col: -1, isShelved: false };
                 });
 
                 const targetSpaces: GridSpace[] = selectedLetterIds.map(id => {
@@ -321,11 +374,12 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                         const runtime = newLetterRuntimes[runtimeIndex];
                         const targetRow = Math.round(runtime.positionWhileDragging.y / GRID_SIZE);
                         const targetCol = Math.round(runtime.positionWhileDragging.x / GRID_SIZE);
-                        return { row: targetRow, col: targetCol };
+                        return { row: targetRow, col: targetCol, isShelved: false /* TODO: DETERMINE TARGET */ };
                     }
-                    return { row: -1, col: -1 };
+                    return { row: -1, col: -1, isShelved: false };
                 });
 
+                // TODO: Change based on whether or not we are targeting board or shelf??
                 const isSameSpace = (a: GridSpace, b: GridSpace) => a.row === b.row && a.col === b.col;
 
                 const freedSpaces = originalSpaces.filter(
@@ -376,6 +430,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                             ...runtime,
                             row: targetRow,
                             col: targetCol,
+                            isShelved: freedSpaces[i].isShelved,
                             positionWhileDragging: getPositionFromCoords(targetRow, targetCol),
                         }
 
@@ -413,7 +468,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
 
         window.addEventListener('mouseup', handleGlobalMouseUp);
         return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
-    }, [isDraggingLetters, selectedLetterIds]);
+    }, [isDraggingLetters, selectedLetterIds, isTypingFromShelf]);
 
     return (
         <ContextNavigation.Provider value={{
@@ -421,6 +476,8 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
             setScroll,
             isDraggingLetters,
             setIsDraggingLetters,
+            isTypingFromShelf,
+            setIsTypingFromShelf,
             letterRuntimes,
             setLetterRuntimes,
             selectedLetterIds,
