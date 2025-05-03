@@ -7,9 +7,9 @@ import { ContextNavigation } from '../contexts/ContextNavigation';
 import { GRID_BOUNDS, GRID_SIZE } from '../constants/Constants';
 
 export default function Board() {
-    const { windowDimensions, setLetterRuntimes, scroll, setScroll, isTypingFromShelf, selectedLetterIds } = useContext(ContextNavigation);
+    const { windowDimensions, setLetterRuntimes, scroll, setScroll, isTypingFromShelf, selectedLetterIds, isDraggingLetters } = useContext(ContextNavigation);
 
-    const [isDragging, setIsDragging] = useState(false);
+    const [isDraggingBounds, setIsDraggingBounds] = useState(false);
     const [startPosition, setStartPosition] = useState({ x: -1, y: -1 });
     const [currentPosition, setCurrentPosition] = useState({ x: -1, y: -1 });
     const [isSpacePressed, setIsSpacePressed] = useState(false);
@@ -38,7 +38,7 @@ export default function Board() {
 
     useEffect(() => {
         const handleGlobalEnd = () => {
-            setIsDragging(false);
+            setIsDraggingBounds(false);
             setStartPosition({ x: -1, y: -1 });
             setCurrentPosition({ x: -1, y: -1 });
         };
@@ -53,6 +53,8 @@ export default function Board() {
     }, []);
 
     const updateActiveLetters = (deltaX: number, deltaY: number) => {
+        if (!(isDraggingLetters || isTypingFromShelf))
+            return;
         setLetterRuntimes(prev => {
             const newLetterRuntimes = [...prev].map(runtime => {
                 if (!selectedLetterIds.includes(runtime.id))
@@ -74,7 +76,7 @@ export default function Board() {
     useEffect(() => {
         const handleGlobalMove = (e: TouchEvent | MouseEvent) => {
             e.preventDefault();
-            if (isDragging) {
+            if (isDraggingBounds) {
                 if (window.TouchEvent && e instanceof window.TouchEvent) {
                     if (e.touches.length > 0) {
                         setCurrentPosition({
@@ -103,7 +105,7 @@ export default function Board() {
             window.removeEventListener('mousemove', handleGlobalMove);
             window.removeEventListener('touchmove', handleGlobalMove);
         };
-    }, [isDragging, isSpacePressed, isTypingFromShelf, selectedLetterIds]);
+    }, [isDraggingBounds, isSpacePressed, isTypingFromShelf, selectedLetterIds, isDraggingLetters]);
 
     useEffect(() => {
         const handleWheel = (e: WheelEvent) => {
@@ -120,7 +122,7 @@ export default function Board() {
         return () => {
             window.removeEventListener('wheel', handleWheel);
         };
-    }, [isTypingFromShelf, selectedLetterIds]);  
+    }, [isTypingFromShelf, selectedLetterIds, isDraggingLetters]);  
 
     const handlePressStart = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
         if (isTypingFromShelf)
@@ -141,7 +143,7 @@ export default function Board() {
             return;
         }
 
-        setIsDragging(true);
+        setIsDraggingBounds(true);
         setStartPosition({ x: clientX, y: clientY });
         setCurrentPosition({ x: clientX, y: clientY });
     }
@@ -210,7 +212,7 @@ export default function Board() {
             {horizontalLines}
             {outOfBounds}
             {<DragBounds
-                isDragging={isDragging}
+                isDragging={isDraggingBounds}
                 startPosition={startPosition}
                 currentPosition={currentPosition}
             />}

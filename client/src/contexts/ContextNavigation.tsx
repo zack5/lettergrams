@@ -253,6 +253,31 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                 }
             }
 
+            // Backspace from shelf
+            if (isTypingFromShelf && key === 'backspace') {
+                if (selectedLetterIds.length > 0) {
+                    setLetterRuntimes(prev => {
+                        const newLetterRuntimes = [...prev];
+                        const lastSelectedId = selectedLetterIds[selectedLetterIds.length - 1];
+                        const findMatchingLetter = (runtime: LetterRuntime) => {return runtime.id === lastSelectedId}
+                        const runtimeIndex = newLetterRuntimes.findIndex(findMatchingLetter);
+                        if (runtimeIndex >= 0) {
+                            const runtime = newLetterRuntimes[runtimeIndex];
+                            const updatedRuntime = {
+                                ...runtime,
+                                isShelved: true,
+                                startedDragFromShelf: false,
+                            }
+
+                            newLetterRuntimes[runtimeIndex] = updatedRuntime;
+                        }
+                        return newLetterRuntimes
+                    });
+                    setSelectedLetterIds(prev => prev.slice(0, prev.length - 1));
+                }
+            }
+
+
             function RotateLetters(clockwise: boolean) {
                 setLetterRuntimes(prev => {
                     const newLetterRuntimes = [...prev];
