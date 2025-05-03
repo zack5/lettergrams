@@ -70,7 +70,7 @@ export default function DialogExitGame() {
                                 type="text"
                                 name="lettersInput"
                                 placeholder="Enter letters"
-                                value={currentUrl}
+                                defaultValue={currentUrl}
                                 maxLength={30}
                                 required
                                 aria-required="true"
