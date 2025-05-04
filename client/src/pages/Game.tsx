@@ -13,7 +13,7 @@ import OffScreenPointer from "../components/OffScreenPointer";
 import { ContextNavigation } from "../contexts/ContextNavigation";
 import { LetterRuntime } from "../types/LetterRuntime";
 import { Coordinate } from "../types/Vector2";
-import { getScreenPositionFromShelf, getShelvedLetterCount } from "../utils/Utils";
+import { getPositionFromCoords, getScreenPositionFromShelf } from "../utils/Utils";
 
 export default function Game({ letters: propLetters }: { letters?: string }) {
     function filterAlphaOnly(input: string): string {
@@ -29,55 +29,62 @@ export default function Game({ letters: propLetters }: { letters?: string }) {
     const { letterRuntimes, setLetterRuntimes, setScroll, windowDimensions } = useContext(ContextNavigation);
 
     useEffect(() => {
-        let coords: Coordinate[] = []
-        if (setup) {
-            coords = setup.split(';').map((value) => {
-                const split = value.split(',');
+        
+        interface GridSpace {
+            row: number;
+            col: number;
+            isShelved: boolean;
+        }
+
+        let spaces: GridSpace[] = [];
+        let usedShelfSpaces = 0;
+        const givenCoords = setup?.split(';') || [];
+        for (let i = 0; i < letters.length; i++) {
+            if (i < givenCoords.length) {
+                const split = givenCoords[i].split(',');
                 if (split.length === 2) {
                     const row = Number(split[0]);
                     const col = Number(split[1])
                     if (!Number.isNaN(row) && !Number.isNaN(col)) {
-                        return {
+                        spaces.push({
                             row,
                             col,
-                        }
+                            isShelved: false,
+                        })
+                        continue;
                     }
                 }
-                return undefined
-            }).filter(value => !!value)
-        }
-
-        let col = 0
-        while (coords.length < letters.length) {
-            const next = {
+            }
+            spaces.push({
                 row: 0,
-                col,
-            }
-            if (!coords.includes(next)) {
-                coords.push(next);
-            }
-            col++;
+                col: usedShelfSpaces,
+                isShelved: true,
+            })
+            usedShelfSpaces++;
         }
 
         const letterRuntimes: LetterRuntime[] = letters.toUpperCase().split('').map((letter, index) => {
 
-            const row = coords ? coords[index].row : 0;
-            const col = coords ? coords[index].col : index;
+            const row = spaces[index].row;
+            const col = spaces[index].col;
+            const isShelved = spaces[index].isShelved;
             return {
                 id: index.toString(),
                 letter: letter,
-                isShelved: true,
+                isShelved,
                 startedDragFromShelf: false,
                 row,
                 col,
-                positionWhileDragging: getScreenPositionFromShelf(col, windowDimensions, coords.length),
+                positionWhileDragging: isShelved 
+                    ? getScreenPositionFromShelf(col, windowDimensions, spaces.length)
+                    : getPositionFromCoords(row, col),
             }
         });
         setLetterRuntimes(letterRuntimes);
 
         setScroll({
-            x: 0,//windowDimensions.width / 2,
-            y: 0//windowDimensions.height / 2,
+            x: windowDimensions.width / 2,
+            y: windowDimensions.height / 2,
         })
     }, [letters, setup]);
 

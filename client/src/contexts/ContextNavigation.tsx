@@ -136,22 +136,13 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                         if (!selectedLetterIds.includes(runtime.id))
                             return runtime;
 
-                        let startingPos;
-                        if (runtime.isShelved) {
-                            startingPos = getScreenPositionFromShelf(runtime.col, windowDimensions, getShelvedLetterCount(prev));
-                            startingPos.x -= scroll.x;
-                            startingPos.y -= scroll.y;
-                        } else {
-                            startingPos = runtime.positionWhileDragging;
-                        }
-
                         return {
                             ...runtime,
                             isShelved: false,
                             startedDragFromShelf: runtime.isShelved || runtime.startedDragFromShelf,
                             positionWhileDragging: {
-                                x: startingPos.x + movementX,
-                                y: startingPos.y + movementY,
+                                x: runtime.positionWhileDragging.x + movementX,
+                                y: runtime.positionWhileDragging.y + movementY,
                             }
                         };
                     });

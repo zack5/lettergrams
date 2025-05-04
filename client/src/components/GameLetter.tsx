@@ -120,6 +120,30 @@ export default function GameLetter({ id }: { id: string }) {
             setSelectedLetterIds(prev => isSelected ? prev : [id]);
         }
         setIsDraggingLetters(true);
+
+        // If starting shelved, convert position to board space
+        setLetterRuntimes(prev => {
+            return prev.map(prevRuntime => {
+                if (runtime?.id != prevRuntime.id)
+                    return prevRuntime;
+
+                let startingPos;
+                if (runtime.isShelved) {
+                    startingPos = getScreenPositionFromShelf(runtime.col, windowDimensions, getShelvedLetterCount(prev));
+                    startingPos.x -= scroll.x;
+                    startingPos.y -= scroll.y;
+                } else {
+                    startingPos = runtime.positionWhileDragging;
+                }
+
+                return {
+                    ...runtime,
+                    isShelved: false,
+                    startedDragFromShelf: runtime.isShelved || runtime.startedDragFromShelf,
+                    positionWhileDragging: startingPos
+                };
+            });
+        });
     }
 
     return (

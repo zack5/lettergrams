@@ -22,7 +22,7 @@ export default function DialogExitGame() {
 
     let query = "";
     if (sharePositions) {
-        query = "?setup=" + letterRuntimes.map(runtime => `${runtime.row},${runtime.col}`).join(';')
+        query = "?setup=" + letterRuntimes.map(runtime => runtime.isShelved ? '' : `${runtime.row},${runtime.col}`).join(';')
     }
 
     const currentUrl = (window.location.origin + location.pathname).replace(/^.*\/\//, "") + query;
