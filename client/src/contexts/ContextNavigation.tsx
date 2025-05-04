@@ -16,6 +16,8 @@ export const ContextNavigation = createContext<{
     setIsDraggingLetters: (isDraggingLetters: boolean | ((prev: boolean) => boolean)) => void;
     isTypingFromShelf: boolean;
     setIsTypingFromShelf: (isDraggingLetters: boolean | ((prev: boolean) => boolean)) => void;
+    isHoveringShelf: boolean;
+    setIsHoveringShelf: (isHoveringShelf: boolean | ((prev: boolean) => boolean)) => void;
     letterRuntimes: LetterRuntime[];
     setLetterRuntimes: (letterRuntimes: LetterRuntime[] | ((prev: LetterRuntime[]) => LetterRuntime[])) => void;
     selectedLetterIds: string[];
@@ -30,6 +32,8 @@ export const ContextNavigation = createContext<{
     setIsDraggingLetters: () => { },
     isTypingFromShelf: false,
     setIsTypingFromShelf: () => { },
+    isHoveringShelf: false,
+    setIsHoveringShelf: () => { },
     letterRuntimes: [],
     setLetterRuntimes: () => { },
     selectedLetterIds: [],
@@ -43,6 +47,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
     const [scroll, setScroll] = useState<Position>({ x: 0, y: 0 });
     const [isDraggingLetters, setIsDraggingLetters] = useState<boolean>(false);
     const [isTypingFromShelf, setIsTypingFromShelf] = useState<boolean>(false);
+    const [isHoveringShelf, setIsHoveringShelf] = useState<boolean>(false);
     const [letterRuntimes, setLetterRuntimes] = useState<LetterRuntime[]>([]);
     const [selectedLetterIds, setSelectedLetterIds] = useState<string[]>([]);
     const [dialogBox, setDialogBox] = useState<DialogBox>(null);
@@ -502,6 +507,8 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
             setIsDraggingLetters,
             isTypingFromShelf,
             setIsTypingFromShelf,
+            isHoveringShelf,
+            setIsHoveringShelf,
             letterRuntimes,
             setLetterRuntimes,
             selectedLetterIds,
