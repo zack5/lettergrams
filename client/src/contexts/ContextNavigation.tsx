@@ -465,8 +465,19 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                     }
                 }
 
+                let firstFreeShelfSpace = 0;
+                if (isHoveringShelf) {
+                    firstFreeShelfSpace = newLetterRuntimes.reduce((maxCol, letter) => {
+                        if (letter.isShelved) {
+                            return Math.max(maxCol, letter.col);
+                        }
+                        return maxCol;
+                    }, 0);
+                    firstFreeShelfSpace += 1;
+                }
+
                 // Move letters that were dragged
-                selectedLetterIds.forEach(id => {
+                selectedLetterIds.forEach((id, index) => {
                     const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === id);
 
                     const found = runtimeIndex !== -1;
@@ -474,18 +485,35 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                         console.error("Should have one runtime for each selected letter");
                     } else {
                         const runtime = newLetterRuntimes[runtimeIndex];
-                        const targetRow = Math.round(runtime.positionWhileDragging.y / GRID_SIZE);
-                        const targetCol = Math.round(runtime.positionWhileDragging.x / GRID_SIZE);
+                        const targetRow = isHoveringShelf ? 0 : Math.round(runtime.positionWhileDragging.y / GRID_SIZE);
+                        const targetCol = isHoveringShelf ? firstFreeShelfSpace + index : Math.round(runtime.positionWhileDragging.x / GRID_SIZE);
                         const updatedRuntime = {
                             ...runtime,
                             row: targetRow,
                             col: targetCol,
-                            isShelved: false, // TODO: not always true
+                            isShelved: isHoveringShelf,
                             startedDragFromShelf: false,
                             positionWhileDragging: getPositionFromCoords(targetRow, targetCol),
                         }
 
                         newLetterRuntimes[runtimeIndex] = updatedRuntime;
+                    }
+                });
+
+                // Ensure shelved letters have sequential col values
+                const shelvedLetters = newLetterRuntimes
+                    .filter(letter => letter.isShelved)
+                    .sort((a, b) => a.col - b.col);
+                let nextShelfCol = 0;
+                shelvedLetters.forEach(letter => {
+                    const runtimeIndex = newLetterRuntimes.findIndex(l => l.id === letter.id);
+                    if (runtimeIndex !== -1) {
+                        newLetterRuntimes[runtimeIndex] = {
+                            ...newLetterRuntimes[runtimeIndex],
+                            col: nextShelfCol,
+                            positionWhileDragging: getPositionFromCoords(0, nextShelfCol)
+                        };
+                        nextShelfCol++;
                     }
                 });
 
@@ -497,7 +525,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
 
         window.addEventListener('mouseup', handleGlobalMouseUp);
         return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
-    }, [isDraggingLetters, selectedLetterIds, isTypingFromShelf]);
+    }, [isDraggingLetters, selectedLetterIds, isTypingFromShelf, isHoveringShelf]);
 
     return (
         <ContextNavigation.Provider value={{

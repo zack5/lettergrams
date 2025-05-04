@@ -43,7 +43,7 @@ export const getScreenPositionFromShelf = (
 export const getShelvedLetterCount = (letterRuntimes: LetterRuntime[]): number => {
     let result = 0;
     for (let i = 0; i < letterRuntimes.length; i++) {
-        if (letterRuntimes[i].isShelved) {
+        if (letterRuntimes[i].isShelved || letterRuntimes[i].startedDragFromShelf) {
             result++;
         }
     }
