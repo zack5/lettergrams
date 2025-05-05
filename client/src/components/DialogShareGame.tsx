@@ -68,12 +68,13 @@ export default function DialogExitGame() {
                                 className="custom-input share-url"
                                 ref={urlInputRef}
                                 type="text"
-                                name="lettersInput"
-                                placeholder="Enter letters"
+                                name="sharable url"
+                                placeholder="Sharable URL"
                                 value={currentUrl}
                                 maxLength={30}
                                 required
                                 aria-required="true"
+                                readOnly
                             />
                             <button
                                 className={`copy-button ${hasCopied ? 'copied' : ''}`}
