@@ -18,11 +18,15 @@
     z-index: 1;
     &.selected {
         border: 2px solid variables.$color-primary;
-        z-index: 200;
+        z-index: 2;
     }
 
     &.shelved {
         z-index: variables.$z-index-shelf + 2;
+    }
+
+    &.being-dragged {
+        z-index: variables.$z-index-shelf + 4;
     }
 
     &.interactive {

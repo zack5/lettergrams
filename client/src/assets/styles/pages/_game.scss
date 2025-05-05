@@ -12,7 +12,7 @@ main.game {
 
 .in-game-text-container {
     position: absolute;
-    z-index: 10;
+    z-index: variables.$z-index-in-game-panel;
     background-color: rgba($color: variables.$color-background-1, $alpha: 0.5);
     backdrop-filter: blur(10px);
     color: variables.$color-text-1;

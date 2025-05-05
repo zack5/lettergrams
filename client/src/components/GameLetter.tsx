@@ -17,7 +17,7 @@ export default function GameLetter({ id }: { id: string }) {
     const letter = runtime?.letter || '';
     const isShelved = runtime ? runtime.isShelved : true;
     const isSelected = selectedLetterIds.includes(id);
-    const updateImmediately = isDraggingLetters && isSelected;// && !(runtime?.isShelved);
+    const updateImmediately = isDraggingLetters && isSelected;
     const dragPosition = runtime?.positionWhileDragging || { x: 0, y: 0 };
     const boardPosition = getPositionFromCoords(runtime?.row || 0, runtime?.col || 0);
     const shelvedPosition = getScreenPositionFromShelf(runtime?.col || 0, windowDimensions, getShelvedLetterCount(letterRuntimes));
@@ -87,19 +87,11 @@ export default function GameLetter({ id }: { id: string }) {
         return () => cancelAnimationFrame(animationFrameId);
     }, [dragPosition, boardPosition, shelvedPosition, x, y, updateImmediately, isShelved, scroll]);
 
-
-    const backgroundPosition = isShelved 
-    ? useTransform(
-        [x, y] as [MotionValue<number>, MotionValue<number>],
+    const backgroundPosition = useTransform(
+        [x, y, top, left] as [MotionValue<number>, MotionValue<number>, MotionValue<number>, MotionValue<number>],
         (values) => {
-            const [latestX, latestY] = values as [number, number];
-            return `-${latestX}px -${latestY}px`;
-        }
-    ): useTransform(
-        [x, y] as [MotionValue<number>, MotionValue<number>],
-        (values) => {
-            const [latestX, latestY] = values as [number, number];
-            return `-${latestX + scroll.x}px -${latestY + scroll.y}px`;
+            const [latestX, latestY, latestTop, latestLeft] = values as [number, number, number, number];
+            return `-${latestX + latestLeft}px -${latestY + latestTop}px`;
         }
     );
 
@@ -152,7 +144,7 @@ export default function GameLetter({ id }: { id: string }) {
     return (
         <Letter
             letter={letter}
-            extraClasses={`interactive ${isSelected ? 'selected' : ''} ${isShelved ? 'shelved' : ''}`}
+            extraClasses={`interactive ${isSelected ? 'selected' : ''} ${isShelved ? 'shelved' : ''} ${updateImmediately ? 'being-dragged' : ''}`}
             props={{
                 style: {
                     x,
@@ -164,8 +156,6 @@ export default function GameLetter({ id }: { id: string }) {
                     left,
                     backgroundPosition,
                     backgroundSize: '100vw 100vh',
-                    borderTopLeftRadius: isShelved ? 0 : 10,
-                    borderTopRightRadius: runtime?.startedDragFromShelf ? 0 : 10,
                 },
                 onMouseDown: onPressStart,
                 onTouchStart: onPressStart,

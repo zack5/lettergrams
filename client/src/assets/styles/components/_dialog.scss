@@ -2,7 +2,7 @@
 
 .dialog-container {
     position: relative;
-    z-index: 50;
+    z-index: variables.$z-index-popup;
 }
 
 .dialog-backdrop {
