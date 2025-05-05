@@ -408,6 +408,17 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
 
                 const isSameSpace = (a: GridSpace, b: GridSpace) => a.row === b.row && a.col === b.col && a.isShelved === b.isShelved;
 
+                // Check for duplicates in targetSpaces. If there are any, abort the move
+                const duplicateTargets = targetSpaces.filter((space, index) => {
+                    return targetSpaces.some((otherSpace, otherIndex) => {
+                        return index !== otherIndex && 
+                               isSameSpace(space, otherSpace);
+                    });
+                });
+                if (duplicateTargets.length > 0) {
+                    return stacks.undo[stacks.undo.length - 1];
+                }
+
                 const freedSpaces = originalSpaces.filter(
                     original => !targetSpaces.some(target => isSameSpace(original, target))
                 );

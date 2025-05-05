@@ -97,8 +97,6 @@ export default function Game({ letters: propLetters }: { letters?: string }) {
             
             const centerPosition = getPositionFromCoords(centerRow, centerCol);
 
-            console.log(centerPosition);
-            
             setScroll({
                 x: windowDimensions.width / 2 - centerPosition.x - GRID_SIZE / 2,
                 y: windowDimensions.height / 2 - centerPosition.y - GRID_SIZE,
