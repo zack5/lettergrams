@@ -1,9 +1,11 @@
 import { useRef, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Input, Label, Field } from '@headlessui/react'
+import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
 
 import AnimatingLetters from "../components/AnimatingLetters"
 import DocumentPage from "../components/DocumentPage"
+import { getRandomLetters } from "../utils/Utils"
 
 export default function Home() {
     const [letters, setLetters] = useState<string>("");
@@ -38,7 +40,7 @@ export default function Home() {
                 </div>
                 <form onSubmit={handleSubmit} aria-labelledby="lettersFormTitle">
                     <h2 id="lettersFormTitle" className="visually-hidden">Enter letters to play with:</h2>
-                    <Field>
+                    <Field className="letters-input-field">
                         <Label className="visually-hidden">Letters:</Label>
                         <Input
                             className="custom-input"
@@ -52,6 +54,19 @@ export default function Home() {
                             required
                             aria-required="true"
                         />
+                        <button
+                            type="button"
+                            aria-label="Random letters"
+                            onClick={() => setLetters(getRandomLetters())}
+                            style={{
+                                padding: '0rem',
+                                height: '2.2rem',
+                                width: '2.2rem',
+                                backgroundColor: 'transparent',
+                            }}
+                        >
+                            <GiPerspectiveDiceSixFacesRandom style={{ fontSize: '2rem' }} />
+                        </button>
                     </Field>
 
                     <button

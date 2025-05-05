@@ -8,4 +8,18 @@ export const SHELF_PADDING = 22;
 export const SHELF_MIN_TILE_COUNT_FOR_WIDTH = 5;
 
 export const UNDO_LIMIT = 30;
- 
+
+export const DICE = [
+    'MMLLBY',
+    'VFGKPP',
+    'HHNNRR',
+    'DFRLLW',
+    'RRDLGG',
+    'XKBSZN',
+    'WHHTTP',
+    'CCBTJD',
+    'CCMTTS',
+    'OIINNY',
+    'AEIOUU',
+    'AAEEOO',
+];

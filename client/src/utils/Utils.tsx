@@ -1,4 +1,4 @@
-import { GRID_SIZE, SHELF_BOTTOM_OFFSET, SHELF_PADDING } from "../constants/Constants";
+import { GRID_SIZE, SHELF_BOTTOM_OFFSET, SHELF_PADDING, DICE } from "../constants/Constants";
 import { LetterRuntime } from "../types/LetterRuntime";
 import { Coordinate, Position, Size } from "../types/Vector2";
 
@@ -48,4 +48,15 @@ export const getShelvedLetterCount = (letterRuntimes: LetterRuntime[]): number =
         }
     }
     return result;
+}
+
+export const getRandomLetters = (): string => {
+    let result = '';
+    for (let i = 0; i < DICE.length; i++) {
+        const dieLetters = DICE[i];
+        const randomIndex = Math.floor(Math.random() * dieLetters.length);
+        result += dieLetters[randomIndex];
+    }
+    // Randomize the order of the letters before returning
+    return result.split('').sort(() => Math.random()).join('');
 }
