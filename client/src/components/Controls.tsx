@@ -51,7 +51,7 @@ export default function Controls() {
                     </tr>
                     <tr>
                         <td><span className="keybinding">Type letters:</span></td>
-                        <td className="control-name">Grab tiles from shelf</td>
+                        <td className="control-name">Grab unplaced letters</td>
                     </tr>
                     <tr>
                         <td><span className="keybinding">Drag rectangle:</span></td>
