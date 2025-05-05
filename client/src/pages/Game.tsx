@@ -14,6 +14,7 @@ import { ContextNavigation } from "../contexts/ContextNavigation";
 import { LetterRuntime } from "../types/LetterRuntime";
 import { Coordinate } from "../types/Vector2";
 import { getPositionFromCoords, getScreenPositionFromShelf } from "../utils/Utils";
+import { GRID_SIZE } from "../constants/Constants";
 
 export default function Game({ letters: propLetters }: { letters?: string }) {
     function filterAlphaOnly(input: string): string {
@@ -82,10 +83,33 @@ export default function Game({ letters: propLetters }: { letters?: string }) {
         });
         setLetterRuntimes(letterRuntimes);
 
-        setScroll({
-            x: windowDimensions.width / 2,
-            y: windowDimensions.height / 2,
-        })
+        // Center the scrolling around the unshelved letters
+        const unshelvedLetters = letterRuntimes.filter(letter => !letter.isShelved);
+        
+        if (unshelvedLetters.length > 0) {
+            const minRow = Math.min(...unshelvedLetters.map(letter => letter.row));
+            const maxRow = Math.max(...unshelvedLetters.map(letter => letter.row));
+            const minCol = Math.min(...unshelvedLetters.map(letter => letter.col));
+            const maxCol = Math.max(...unshelvedLetters.map(letter => letter.col));
+            
+            const centerRow = (minRow + maxRow) / 2;
+            const centerCol = (minCol + maxCol) / 2;
+            
+            const centerPosition = getPositionFromCoords(centerRow, centerCol);
+
+            console.log(centerPosition);
+            
+            setScroll({
+                x: windowDimensions.width / 2 - centerPosition.x - GRID_SIZE / 2,
+                y: windowDimensions.height / 2 - centerPosition.y - GRID_SIZE,
+            });
+        } else {
+            // If no unshelved letters, center on the board
+            setScroll({
+                x: windowDimensions.width / 2,
+                y: windowDimensions.height / 2,
+            });
+        }
     }, [letters, setup]);
 
     const letterElements = letters.split('').map((_, index) => (
