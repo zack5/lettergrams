@@ -416,8 +416,6 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                     target => !originalSpaces.some(original => isSameSpace(target, original))
                 );
 
-                console.log(originalSpaces, targetSpaces, freedSpaces, occupiedSpaces);
-
                 const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === selectedLetterIds[0]);
                 if (runtimeIndex === -1) {
                     console.error("Should have one runtime for each selected letter");
@@ -473,8 +471,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                     isVacant: boolean;
                 }
 
-                
-                let shelvedSpaces: ShelvedSpace[] = prev
+                let shelvedSpaces: ShelvedSpace[] = newLetterRuntimes
                     .filter(letter => letter.isShelved || letter.startedDragFromShelf)
                     .sort((a, b) => a.col - b.col)
                     .map(letter => ({id: letter.id, isVacant: letter.startedDragFromShelf}));

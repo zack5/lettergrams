@@ -27,7 +27,7 @@ export default function GameLetterShelf({ children }: { children?: ReactNode }) 
 
             const diffX = e.clientX - windowDimensions.width / 2;
             const shelfSlot = Math.round(diffX / GRID_SIZE + shelvedLetterCount / 2);
-            const clamped = Math.max(0, Math.min(shelvedLetterCount - 1, shelfSlot));
+            const clamped = Math.max(0, Math.min(shelvedLetterCount, shelfSlot));
             setHoveredShelfSlot(clamped);
         };
 
