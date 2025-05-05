@@ -12,7 +12,6 @@ import OffScreenPointer from "../components/OffScreenPointer";
 
 import { ContextNavigation } from "../contexts/ContextNavigation";
 import { LetterRuntime } from "../types/LetterRuntime";
-import { Coordinate } from "../types/Vector2";
 import { getPositionFromCoords, getScreenPositionFromShelf } from "../utils/Utils";
 import { GRID_SIZE } from "../constants/Constants";
 

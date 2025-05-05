@@ -7,8 +7,7 @@ import { LetterRuntime } from '../types/LetterRuntime';
 import { DialogBox } from '../types/DialogBox';
 import { Position } from '../types/Vector2';
 
-import { getCoordsFromPosition, getPositionFromCoords, getScreenPositionFromShelf, getShelvedLetterCount } from '../utils/Utils';
-import { hover } from 'motion';
+import { getCoordsFromPosition, getPositionFromCoords, } from '../utils/Utils';
 
 export const ContextNavigation = createContext<{
     scroll: Position;
