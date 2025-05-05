@@ -1,14 +1,16 @@
-import { ReactNode, useContext, useEffect, useRef, useState } from "react";
+import { ReactNode, useContext, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+
+import ShelfDragIndicator from "./ShelfDragIndicator";
 
 import { ContextNavigation } from "../contexts/ContextNavigation";
 
-import { GRID_SIZE, SHELF_BOTTOM_OFFSET, SHELF_PADDING } from "../constants/Constants";
+import { GRID_SIZE, SHELF_BOTTOM_OFFSET, SHELF_PADDING, SHELF_MIN_TILE_COUNT_FOR_WIDTH } from "../constants/Constants";
 
 import { getShelvedLetterCount } from "../utils/Utils";
 
 export default function GameLetterShelf({ children }: { children?: ReactNode }) {
-    const { letterRuntimes, setHoveredShelfSlot, windowDimensions } = useContext(ContextNavigation);
+    const { letterRuntimes, hoveredShelfSlot, setHoveredShelfSlot, windowDimensions, isDraggingLetters } = useContext(ContextNavigation);
 
     const widgetRef = useRef<HTMLDivElement>(null);
 
@@ -41,7 +43,7 @@ export default function GameLetterShelf({ children }: { children?: ReactNode }) 
             className="game-letter-shelf in-game-text-container"
             style={{
                 padding: SHELF_PADDING,
-                minWidth: GRID_SIZE * 5,
+                minWidth: GRID_SIZE * SHELF_MIN_TILE_COUNT_FOR_WIDTH,
                 height: GRID_SIZE,
                 bottom: `${SHELF_BOTTOM_OFFSET}px`,
             }}
@@ -50,6 +52,7 @@ export default function GameLetterShelf({ children }: { children?: ReactNode }) 
             }}
         >
             {children}
+            {hoveredShelfSlot !== null && isDraggingLetters && <ShelfDragIndicator hoveredShelfSlot={hoveredShelfSlot} shelvedLetterCount={shelvedLetterCount} />}
         </motion.div>
     )
 }

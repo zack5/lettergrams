@@ -7,3 +7,9 @@ div.game-letter-shelf {
     display: flex;
     flex-direction: row;
 }
+
+.shelf-drag-indicator {
+    border-radius: 20px;
+    border: 1px solid variables.$color-primary;
+    z-index: variables.$z-index-shelf + 10;
+}
