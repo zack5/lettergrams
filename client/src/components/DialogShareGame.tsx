@@ -25,7 +25,7 @@ export default function DialogExitGame() {
         query = "?setup=" + letterRuntimes.map(runtime => runtime.isShelved ? '' : `${runtime.row},${runtime.col}`).join(';')
     }
 
-    const currentUrl = (window.location.origin + location.pathname).replace(/^.*\/\//, "") + query;
+    const currentUrl = window.location.origin + location.pathname + query;
 
     const handleCopy = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
@@ -70,7 +70,7 @@ export default function DialogExitGame() {
                                 type="text"
                                 name="lettersInput"
                                 placeholder="Enter letters"
-                                defaultValue={currentUrl}
+                                value={currentUrl}
                                 maxLength={30}
                                 required
                                 aria-required="true"

@@ -12,7 +12,7 @@ export default function LogoInGame() {
     const { setDialogBox } = useContext(ContextNavigation);
 
     return (
-        <CollapsiblePanel name="LetterGrams" corner="bottom-left">
+        <CollapsiblePanel name="Menu" corner="bottom-left">
             <div className="panel flex-panel">
                 <button
                     className="panel-button"
