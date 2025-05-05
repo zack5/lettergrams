@@ -22,8 +22,8 @@ export default function GameLetter({ id }: { id: string }) {
     const boardPosition = getPositionFromCoords(runtime?.row || 0, runtime?.col || 0);
     const shelvedPosition = getScreenPositionFromShelf(runtime?.col || 0, windowDimensions, getShelvedLetterCount(letterRuntimes));
 
-    const x = useMotionValue(boardPosition.x);
-    const y = useMotionValue(boardPosition.y);
+    const x = useMotionValue(shelvedPosition.x);
+    const y = useMotionValue(shelvedPosition.y);
     const top = useMotionValue(0);
     const left = useMotionValue(0);
     const [_, forceRerender] = useState(true); // Hack
@@ -118,7 +118,7 @@ export default function GameLetter({ id }: { id: string }) {
         // If starting shelved, convert position to board space
         setLetterRuntimes(prev => {
             return prev.map(prevRuntime => {
-                const isStartingFromShelf = (prevRuntime.isShelved && upcomingSelectedLetterIds.includes(prevRuntime.id)) || (prevRuntime.id == id && isShelved);
+                const isStartingFromShelf = prevRuntime.isShelved && upcomingSelectedLetterIds.includes(prevRuntime.id);
                 if (!isStartingFromShelf)
                     return prevRuntime;
 
