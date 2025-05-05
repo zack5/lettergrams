@@ -41,13 +41,13 @@ export default function Controls() {
 
     return (
         <CollapsiblePanel name="Controls" corner="bottom-right">
-            <div className="panel-group-label">Moving Tiles</div>
+            <div className="panel-group-label">Moving Letters</div>
             <table className="panel" ref={(el) => { tableRefs.current[0] = el; }}>
                 {colgroup}
                 <tbody>
                     <tr>
                         <td><span className="keybinding">Mouse:</span></td>
-                        <td className="control-name">Drag tiles</td>
+                        <td className="control-name">Drag letters</td>
                     </tr>
                     <tr>
                         <td><span className="keybinding">Type letters:</span></td>
@@ -55,7 +55,7 @@ export default function Controls() {
                     </tr>
                     <tr>
                         <td><span className="keybinding">Drag rectangle:</span></td>
-                        <td className="control-name">Select multiple tiles</td>
+                        <td className="control-name">Select multiple letters</td>
                     </tr>
                     <tr>
                         <td><span className="keybinding"><ImCommand />Click:</span></td>
