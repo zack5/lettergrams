@@ -38,7 +38,8 @@ export default function Game({ letters: propLetters }: { letters?: string }) {
 
         let spaces: GridSpace[] = [];
         let usedShelfSpaces = 0;
-        const givenCoords = setup?.split(';') || [];
+        const givenCoords = setup?.split(' ') || []; // the + is replaced with a space in the query string
+        console.log(givenCoords);
         for (let i = 0; i < letters.length; i++) {
             if (i < givenCoords.length) {
                 const split = givenCoords[i].split(',');
