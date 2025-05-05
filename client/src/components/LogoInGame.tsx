@@ -21,7 +21,7 @@ export default function LogoInGame() {
                         setDialogBox(DialogBox.ShareGame);
                     }}
                 >
-                    <IoMdExit /><span>Share Board</span>
+                    <IoMdShare /><span>Share Board</span>
                 </button>
                 <button
                     className="panel-button"
@@ -30,7 +30,7 @@ export default function LogoInGame() {
                         setDialogBox(DialogBox.ExitGame);
                     }}
                 >
-                    <IoMdShare /><span>Exit</span>
+                    <IoMdExit /><span>Exit</span>
                 </button>
             </div>
 
