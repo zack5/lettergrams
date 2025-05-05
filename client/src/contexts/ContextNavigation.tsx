@@ -8,6 +8,7 @@ import { DialogBox } from '../types/DialogBox';
 import { Position } from '../types/Vector2';
 
 import { getCoordsFromPosition, getPositionFromCoords, getScreenPositionFromShelf, getShelvedLetterCount } from '../utils/Utils';
+import { hover } from 'motion';
 
 export const ContextNavigation = createContext<{
     scroll: Position;
@@ -16,8 +17,8 @@ export const ContextNavigation = createContext<{
     setIsDraggingLetters: (isDraggingLetters: boolean | ((prev: boolean) => boolean)) => void;
     isTypingFromShelf: boolean;
     setIsTypingFromShelf: (isDraggingLetters: boolean | ((prev: boolean) => boolean)) => void;
-    isHoveringShelf: boolean;
-    setIsHoveringShelf: (isHoveringShelf: boolean | ((prev: boolean) => boolean)) => void;
+    hoveredShelfSlot: number | null;
+    setHoveredShelfSlot: (hoveredShelfSlot: number | null | ((prev: number | null) => number | null)) => void;
     letterRuntimes: LetterRuntime[];
     setLetterRuntimes: (letterRuntimes: LetterRuntime[] | ((prev: LetterRuntime[]) => LetterRuntime[])) => void;
     selectedLetterIds: string[];
@@ -32,8 +33,8 @@ export const ContextNavigation = createContext<{
     setIsDraggingLetters: () => { },
     isTypingFromShelf: false,
     setIsTypingFromShelf: () => { },
-    isHoveringShelf: false,
-    setIsHoveringShelf: () => { },
+    hoveredShelfSlot: -1,
+    setHoveredShelfSlot: () => { },
     letterRuntimes: [],
     setLetterRuntimes: () => { },
     selectedLetterIds: [],
@@ -47,7 +48,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
     const [scroll, setScroll] = useState<Position>({ x: 0, y: 0 });
     const [isDraggingLetters, setIsDraggingLetters] = useState<boolean>(false);
     const [isTypingFromShelf, setIsTypingFromShelf] = useState<boolean>(false);
-    const [isHoveringShelf, setIsHoveringShelf] = useState<boolean>(false);
+    const [hoveredShelfSlot, setHoveredShelfSlot] = useState<number | null>(null);
     const [letterRuntimes, setLetterRuntimes] = useState<LetterRuntime[]>([]);
     const [selectedLetterIds, setSelectedLetterIds] = useState<string[]>([]);
     const [dialogBox, setDialogBox] = useState<DialogBox>(null);
@@ -400,13 +401,12 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                         const runtime = newLetterRuntimes[runtimeIndex];
                         const targetRow = Math.round(runtime.positionWhileDragging.y / GRID_SIZE);
                         const targetCol = Math.round(runtime.positionWhileDragging.x / GRID_SIZE);
-                        return { row: targetRow, col: targetCol, isShelved: false /* TODO: DETERMINE TARGET */ };
+                        return { row: targetRow, col: targetCol, isShelved: hoveredShelfSlot !== null };
                     }
                     return { row: -1, col: -1, isShelved: false };
                 });
 
-                // TODO: Change based on whether or not we are targeting board or shelf??
-                const isSameSpace = (a: GridSpace, b: GridSpace) => a.row === b.row && a.col === b.col;
+                const isSameSpace = (a: GridSpace, b: GridSpace) => a.row === b.row && a.col === b.col && a.isShelved === b.isShelved;
 
                 const freedSpaces = originalSpaces.filter(
                     original => !targetSpaces.some(target => isSameSpace(original, target))
@@ -415,6 +415,8 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                 const occupiedSpaces = targetSpaces.filter(
                     target => !originalSpaces.some(original => isSameSpace(target, original))
                 );
+
+                console.log(originalSpaces, targetSpaces, freedSpaces, occupiedSpaces);
 
                 const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === selectedLetterIds[0]);
                 if (runtimeIndex === -1) {
@@ -445,7 +447,8 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                     const occupiedSpace = occupiedSpaces[i];
 
                     const runtimeIndex = newLetterRuntimes.findIndex(letter => {
-                        return letter.row === occupiedSpace.row && letter.col === occupiedSpace.col;
+                        return letter.row === occupiedSpace.row && letter.col === occupiedSpace.col
+                            && (letter.isShelved || letter.startedDragFromShelf) === occupiedSpace.isShelved;
                     });
 
                     if (runtimeIndex !== -1) {
@@ -465,33 +468,56 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                     }
                 }
 
-                let firstFreeShelfSpace = 0;
-                if (isHoveringShelf) {
-                    firstFreeShelfSpace = newLetterRuntimes.reduce((maxCol, letter) => {
-                        if (letter.isShelved) {
-                            return Math.max(maxCol, letter.col);
-                        }
-                        return maxCol;
-                    }, 0);
-                    firstFreeShelfSpace += 1;
+                interface ShelvedSpace {
+                    id: string;
+                    isVacant: boolean;
                 }
 
+                
+                let shelvedSpaces: ShelvedSpace[] = prev
+                    .filter(letter => letter.isShelved || letter.startedDragFromShelf)
+                    .sort((a, b) => a.col - b.col)
+                    .map(letter => ({id: letter.id, isVacant: letter.startedDragFromShelf}));
+
+                // Insert dragged letters into shelf
+                if (hoveredShelfSlot !== null) {
+                    const draggedLetterIds = selectedLetterIds
+                        .sort((a, b) => {
+                            const runtimeA = newLetterRuntimes.find(letter => letter.id === a);
+                            const runtimeB = newLetterRuntimes.find(letter => letter.id === b);
+                            return (runtimeA?.col || 0) - (runtimeB?.col || 0);
+                        })
+
+                    // Insert the dragged letter IDs at the hovered position
+                    shelvedSpaces.splice(
+                        hoveredShelfSlot,
+                        0,
+                        ...draggedLetterIds.map(id => ({id, isVacant: false}))
+                    );
+
+                }
+                
+                const shelvedLetterIds = shelvedSpaces
+                    .filter(space => !space.isVacant)
+                    .map(space => space.id);
+
                 // Move letters that were dragged
-                selectedLetterIds.forEach((id, index) => {
+                selectedLetterIds.forEach(id => {
                     const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === id);
+                    const willBeShelved = shelvedLetterIds.includes(id);
 
                     const found = runtimeIndex !== -1;
                     if (!found) {
                         console.error("Should have one runtime for each selected letter");
                     } else {
                         const runtime = newLetterRuntimes[runtimeIndex];
-                        const targetRow = isHoveringShelf ? 0 : Math.round(runtime.positionWhileDragging.y / GRID_SIZE);
-                        const targetCol = isHoveringShelf ? firstFreeShelfSpace + index : Math.round(runtime.positionWhileDragging.x / GRID_SIZE);
+                        const targetRow = Math.round(runtime.positionWhileDragging.y / GRID_SIZE);
+                        const targetCol = Math.round(runtime.positionWhileDragging.x / GRID_SIZE);
                         const updatedRuntime = {
                             ...runtime,
                             row: targetRow,
                             col: targetCol,
-                            isShelved: isHoveringShelf,
+                            isShelved: willBeShelved,
                             startedDragFromShelf: false,
                             positionWhileDragging: getPositionFromCoords(targetRow, targetCol),
                         }
@@ -500,22 +526,23 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
                     }
                 });
 
-                // Ensure shelved letters have sequential col values
-                const shelvedLetters = newLetterRuntimes
-                    .filter(letter => letter.isShelved)
-                    .sort((a, b) => a.col - b.col);
-                let nextShelfCol = 0;
-                shelvedLetters.forEach(letter => {
-                    const runtimeIndex = newLetterRuntimes.findIndex(l => l.id === letter.id);
+                // Update positions of all shelved letters based on their order in shelvedLetterIds
+                shelvedLetterIds.forEach((id, index) => {
+                    const runtimeIndex = newLetterRuntimes.findIndex(letter => letter.id === id);
                     if (runtimeIndex !== -1) {
-                        newLetterRuntimes[runtimeIndex] = {
-                            ...newLetterRuntimes[runtimeIndex],
-                            col: nextShelfCol,
-                            positionWhileDragging: getPositionFromCoords(0, nextShelfCol)
-                        };
-                        nextShelfCol++;
+                        const runtime = newLetterRuntimes[runtimeIndex];
+                        if (runtime.isShelved) {
+                            newLetterRuntimes[runtimeIndex] = {
+                                ...runtime,
+                                row: 0,
+                                col: index,
+                                positionWhileDragging: getPositionFromCoords(0, index)
+                            };
+                        }
                     }
                 });
+
+                
 
                 PushUndoState(newLetterRuntimes);
 
@@ -525,7 +552,7 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
 
         window.addEventListener('mouseup', handleGlobalMouseUp);
         return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
-    }, [isDraggingLetters, selectedLetterIds, isTypingFromShelf, isHoveringShelf]);
+    }, [isDraggingLetters, selectedLetterIds, isTypingFromShelf, hoveredShelfSlot]);
 
     return (
         <ContextNavigation.Provider value={{
@@ -535,8 +562,8 @@ export function ContextNavigationProvider({ children }: { children: React.ReactN
             setIsDraggingLetters,
             isTypingFromShelf,
             setIsTypingFromShelf,
-            isHoveringShelf,
-            setIsHoveringShelf,
+            hoveredShelfSlot,
+            setHoveredShelfSlot,
             letterRuntimes,
             setLetterRuntimes,
             selectedLetterIds,

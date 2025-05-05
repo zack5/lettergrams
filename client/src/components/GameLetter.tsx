@@ -108,38 +108,41 @@ export default function GameLetter({ id }: { id: string }) {
             return;
 
         event.preventDefault();
+
+        let upcomingSelectedLetterIds = selectedLetterIds;
         if ('shiftKey' in event && event.shiftKey) {
-            setSelectedLetterIds(prev =>
-                prev.includes(id)
-                    ? prev.filter(existingId => existingId !== id)
-                    : [...prev, id]
-            );
+            upcomingSelectedLetterIds = upcomingSelectedLetterIds.includes(id)
+                ? upcomingSelectedLetterIds.filter(existingId => existingId !== id)
+                : [...upcomingSelectedLetterIds, id];
         } else if ('metaKey' in event && (event.metaKey || event.ctrlKey)) {
-            setSelectedLetterIds(prev => [...prev, id]);
+            upcomingSelectedLetterIds = [...upcomingSelectedLetterIds, id];
         } else {
-            setSelectedLetterIds(prev => isSelected ? prev : [id]);
+            upcomingSelectedLetterIds = isSelected ? upcomingSelectedLetterIds : [id];
         }
+        setSelectedLetterIds(upcomingSelectedLetterIds);
+
         setIsDraggingLetters(true);
 
         // If starting shelved, convert position to board space
         setLetterRuntimes(prev => {
             return prev.map(prevRuntime => {
-                if (runtime?.id != prevRuntime.id)
+                const isStartingFromShelf = (prevRuntime.isShelved && upcomingSelectedLetterIds.includes(prevRuntime.id)) || (prevRuntime.id == id && isShelved);
+                if (!isStartingFromShelf)
                     return prevRuntime;
 
                 let startingPos;
-                if (runtime.isShelved) {
-                    startingPos = getScreenPositionFromShelf(runtime.col, windowDimensions, getShelvedLetterCount(prev));
+                if (isStartingFromShelf) {
+                    startingPos = getScreenPositionFromShelf(prevRuntime.col, windowDimensions, getShelvedLetterCount(prev));
                     startingPos.x -= scroll.x;
                     startingPos.y -= scroll.y;
                 } else {
-                    startingPos = runtime.positionWhileDragging;
+                    startingPos = prevRuntime.positionWhileDragging;
                 }
 
                 return {
-                    ...runtime,
+                    ...prevRuntime,
                     isShelved: false,
-                    startedDragFromShelf: runtime.isShelved || runtime.startedDragFromShelf,
+                    startedDragFromShelf: isStartingFromShelf,
                     positionWhileDragging: startingPos
                 };
             });
