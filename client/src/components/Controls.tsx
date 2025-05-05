@@ -41,7 +41,7 @@ export default function Controls() {
 
     return (
         <CollapsiblePanel name="Controls" corner="bottom-right">
-            <div className="panel-group-label">Moving Letters</div>
+            <div className="panel-group-label">Moving letters</div>
             <table className="panel" ref={(el) => { tableRefs.current[0] = el; }}>
                 {colgroup}
                 <tbody>
