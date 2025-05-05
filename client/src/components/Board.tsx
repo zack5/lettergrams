@@ -9,7 +9,7 @@ import { GRID_BOUNDS, GRID_SIZE } from '../constants/Constants';
 export default function Board() {
     const { windowDimensions, setLetterRuntimes, scroll, setScroll, isTypingFromShelf, selectedLetterIds, isDraggingLetters } = useContext(ContextNavigation);
 
-    const [isDraggingBounds, setIsDraggingBounds] = useState(false);
+    const [isMouseDown, setIsMouseDown] = useState(false);
     const [startPosition, setStartPosition] = useState({ x: -1, y: -1 });
     const [currentPosition, setCurrentPosition] = useState({ x: -1, y: -1 });
     const [isSpacePressed, setIsSpacePressed] = useState(false);
@@ -38,7 +38,7 @@ export default function Board() {
 
     useEffect(() => {
         const handleGlobalEnd = () => {
-            setIsDraggingBounds(false);
+            setIsMouseDown(false);
             setStartPosition({ x: -1, y: -1 });
             setCurrentPosition({ x: -1, y: -1 });
         };
@@ -76,25 +76,25 @@ export default function Board() {
     useEffect(() => {
         const handleGlobalMove = (e: TouchEvent | MouseEvent) => {
             e.preventDefault();
-            if (isDraggingBounds) {
-                if (window.TouchEvent && e instanceof window.TouchEvent) {
-                    if (e.touches.length > 0) {
+            if (isMouseDown) {
+                if (isSpacePressed && e instanceof MouseEvent) {
+                    setScroll(prev => ({ x: prev.x + e.movementX, y: prev.y + e.movementY }))
+                    updateActiveLetters(e.movementX, e.movementY)
+                } else {
+                    if (window.TouchEvent && e instanceof window.TouchEvent) {
+                        if (e.touches.length > 0) {
+                            setCurrentPosition({
+                                x: e.touches[0].clientX,
+                                y: e.touches[0].clientY
+                            });
+                        }
+                    } else if (e instanceof MouseEvent) {
                         setCurrentPosition({
-                            x: e.touches[0].clientX,
-                            y: e.touches[0].clientY
+                            x: e.clientX,
+                            y: e.clientY
                         });
                     }
-                } else if (e instanceof MouseEvent) {
-                    setCurrentPosition({
-                        x: e.clientX,
-                        y: e.clientY
-                    });
                 }
-            }
-
-            if (isSpacePressed && e instanceof MouseEvent) {
-                setScroll(prev => ({ x: prev.x + e.movementX, y: prev.y + e.movementY }))
-                updateActiveLetters(e.movementX, e.movementY)
             }
         };
 
@@ -105,7 +105,7 @@ export default function Board() {
             window.removeEventListener('mousemove', handleGlobalMove);
             window.removeEventListener('touchmove', handleGlobalMove);
         };
-    }, [isDraggingBounds, isSpacePressed, isTypingFromShelf, selectedLetterIds, isDraggingLetters]);
+    }, [isMouseDown, isSpacePressed, isTypingFromShelf, selectedLetterIds, isDraggingLetters]);
 
     useEffect(() => {
         const handleWheel = (e: WheelEvent) => {
@@ -116,13 +116,13 @@ export default function Board() {
             }));
             updateActiveLetters(e.deltaX, e.deltaY)
         };
-    
+
         window.addEventListener('wheel', handleWheel, { passive: false });
-    
+
         return () => {
             window.removeEventListener('wheel', handleWheel);
         };
-    }, [isTypingFromShelf, selectedLetterIds, isDraggingLetters]);  
+    }, [isTypingFromShelf, selectedLetterIds, isDraggingLetters]);
 
     const handlePressStart = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
         if (isTypingFromShelf)
@@ -143,7 +143,7 @@ export default function Board() {
             return;
         }
 
-        setIsDraggingBounds(true);
+        setIsMouseDown(true);
         setStartPosition({ x: clientX, y: clientY });
         setCurrentPosition({ x: clientX, y: clientY });
     }
@@ -212,7 +212,7 @@ export default function Board() {
             {horizontalLines}
             {outOfBounds}
             {<DragBounds
-                isDragging={isDraggingBounds}
+                isDragging={isMouseDown && !isSpacePressed}
                 startPosition={startPosition}
                 currentPosition={currentPosition}
             />}

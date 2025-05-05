@@ -41,7 +41,7 @@ export default function Controls() {
 
     return (
         <CollapsiblePanel name="Controls" corner="bottom-right">
-            <div className="panel-group-label">Movement</div>
+            <div className="panel-group-label">Moving Tiles</div>
             <table className="panel" ref={(el) => { tableRefs.current[0] = el; }}>
                 {colgroup}
                 <tbody>
@@ -50,8 +50,12 @@ export default function Controls() {
                         <td className="control-name">Drag tiles</td>
                     </tr>
                     <tr>
-                        <td><span className="keybinding">Space + Mouse:</span></td>
-                        <td className="control-name">Scroll</td>
+                        <td><span className="keybinding">Type letters:</span></td>
+                        <td className="control-name">Grab tiles from shelf</td>
+                    </tr>
+                    <tr>
+                        <td><span className="keybinding">Drag rectangle:</span></td>
+                        <td className="control-name">Select multiple tiles</td>
                     </tr>
                     <tr>
                         <td><span className="keybinding"><ImCommand />Click:</span></td>
@@ -64,7 +68,7 @@ export default function Controls() {
                 </tbody>
             </table>
 
-            <div className="panel-group-label">While dragging</div>
+            <div className="panel-group-label">While dragging multiple letters</div>
             <table className="panel" ref={(el) => { tableRefs.current[1] = el; }}>
                 {colgroup}
                 <tbody>
@@ -83,6 +87,10 @@ export default function Controls() {
             <table className="panel" ref={(el) => { tableRefs.current[2] = el; }}>
                 {colgroup}
                 <tbody>
+                    <tr>
+                        <td><span className="keybinding">Space + Mouse:</span></td>
+                        <td className="control-name">Scroll</td>
+                    </tr>
                     <tr>
                         <td><span className="keybinding"><ImCommand />Z:</span></td>
                         <td className="control-name">Undo</td>
