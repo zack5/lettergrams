@@ -60,3 +60,13 @@ export const getRandomLetters = (): string => {
     // Randomize the order of the letters before returning
     return result.split('').sort(() => Math.random()).join('');
 }
+
+export const getDailyLetters = (): string => {
+    const dailyOptions = [
+        'Daily',
+    ]
+    
+    const today = new Date();
+    const daysSinceEpoch = Math.floor(today.getTime() / (1000 * 60 * 60 * 24));
+    return dailyOptions[daysSinceEpoch % dailyOptions.length];
+}

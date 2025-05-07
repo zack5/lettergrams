@@ -13,7 +13,7 @@ export default function Home() {
 
     const navigate = useNavigate();
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmitCustomGame = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         const lettersInput = lettersInputRef.current;
@@ -31,6 +31,11 @@ export default function Home() {
         }
     }
 
+    const handleSubmitDailyGame = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        navigate(`/daily`);
+    }
+
     return (
         <DocumentPage>
             <div className="page-container">
@@ -38,7 +43,17 @@ export default function Home() {
                 <div className="mobile-only">
                     <b>Warning:</b> LetterGrams is not yet optimized for mobile!
                 </div>
-                <form onSubmit={handleSubmit} aria-labelledby="lettersFormTitle">
+                <form onSubmit={handleSubmitDailyGame} aria-labelledby="playDailyFormTitle">
+                    <h2 id="playDailyFormTitle" className="visually-hidden">Enter letters to play with:</h2>
+                    <button
+                        type="submit"
+                        aria-label="Play Daily Game"
+                    >
+                        Play Daily Game!
+                    </button>
+                </form>
+                <hr className="divider" />
+                <form onSubmit={handleSubmitCustomGame} aria-labelledby="lettersFormTitle">
                     <h2 id="lettersFormTitle" className="visually-hidden">Enter letters to play with:</h2>
                     <Field className="letters-input-field">
                         <Label className="visually-hidden">Letters:</Label>
@@ -71,9 +86,9 @@ export default function Home() {
 
                     <button
                         type="submit"
-                        aria-label="Play"
+                        aria-label="Play Custom Game"
                     >
-                        Play!
+                        Play Custom Game!
                     </button>
                 </form>
             </div>

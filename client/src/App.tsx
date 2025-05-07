@@ -17,6 +17,10 @@ export default function App() {
                     <ContextNavigationProvider>
                         <Game />
                     </ContextNavigationProvider>} />
+                <Route path="/daily" element={
+                    <ContextNavigationProvider>
+                        <Game isDailyGame={true} />
+                    </ContextNavigationProvider>} />
                 <Route path="/about" element={<About />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>

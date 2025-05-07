@@ -12,16 +12,16 @@ import OffScreenPointer from "../components/OffScreenPointer";
 
 import { ContextNavigation } from "../contexts/ContextNavigation";
 import { LetterRuntime } from "../types/LetterRuntime";
-import { getPositionFromCoords, getScreenPositionFromShelf } from "../utils/Utils";
+import { getPositionFromCoords, getScreenPositionFromShelf, getDailyLetters } from "../utils/Utils";
 import { GRID_SIZE } from "../constants/Constants";
 
-export default function Game({ letters: propLetters }: { letters?: string }) {
+export default function Game({ letters: propLetters, isDailyGame }: { letters?: string, isDailyGame?: boolean }) {
     function filterAlphaOnly(input: string): string {
         return input.replace(/[^A-Za-z]/g, '');
     }
 
     const { letters: paramLetters } = useParams();
-    const letters = filterAlphaOnly(paramLetters || propLetters || 'LetterGrams');
+    const letters = filterAlphaOnly((isDailyGame && getDailyLetters()) || paramLetters || propLetters || 'LetterGrams');
 
     const [searchParams, _] = useSearchParams();
     const setup = searchParams.get('setup')
