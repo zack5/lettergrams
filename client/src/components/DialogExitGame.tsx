@@ -3,13 +3,13 @@ import { useNavigate } from "react-router-dom";
 
 import { Description, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 
-import { ContextNavigation } from "../contexts/ContextNavigation";
+import { ContextGame } from "../contexts/ContextGame";
 
 import { DialogBox } from "../types/DialogBox"
 
 export default function DialogExitGame() {
     const navigate = useNavigate();
-    const { dialogBox, setDialogBox } = useContext(ContextNavigation);
+    const { dialogBox, setDialogBox } = useContext(ContextGame);
 
     const handleClose = () => {
         setDialogBox(null);

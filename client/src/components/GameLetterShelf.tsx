@@ -3,14 +3,14 @@ import { motion } from "framer-motion";
 
 import ShelfDragIndicator from "./ShelfDragIndicator";
 
-import { ContextNavigation } from "../contexts/ContextNavigation";
+import { ContextGame } from "../contexts/ContextGame";
 
 import { GRID_SIZE, SHELF_BOTTOM_OFFSET, SHELF_PADDING, SHELF_MIN_TILE_COUNT_FOR_WIDTH } from "../constants/Constants";
 
 import { getShelvedLetterCount } from "../utils/Utils";
 
 export default function GameLetterShelf({ children }: { children?: ReactNode }) {
-    const { letterRuntimes, hoveredShelfSlot, setHoveredShelfSlot, windowDimensions, isDraggingLetters } = useContext(ContextNavigation);
+    const { letterRuntimes, hoveredShelfSlot, setHoveredShelfSlot, windowDimensions, isDraggingLetters } = useContext(ContextGame);
 
     const widgetRef = useRef<HTMLDivElement>(null);
 

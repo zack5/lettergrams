@@ -10,7 +10,7 @@ import GameLetterShelf from "../components/GameLetterShelf";
 import LogoInGame from "../components/LogoInGame";
 import OffScreenPointer from "../components/OffScreenPointer";
 
-import { ContextNavigation } from "../contexts/ContextNavigation";
+import { ContextGame } from "../contexts/ContextGame";
 import { LetterRuntime } from "../types/LetterRuntime";
 import { getPositionFromCoords, getScreenPositionFromShelf, getDailyLetters } from "../utils/Utils";
 import { GRID_SIZE } from "../constants/Constants";
@@ -26,7 +26,7 @@ export default function Game({ letters: propLetters, isDailyGame }: { letters?: 
     const [searchParams, _] = useSearchParams();
     const setup = searchParams.get('setup')
 
-    const { letterRuntimes, setLetterRuntimes, setScroll, windowDimensions } = useContext(ContextNavigation);
+    const { letterRuntimes, setLetterRuntimes, setScroll, windowDimensions } = useContext(ContextGame);
 
     useEffect(() => {
         

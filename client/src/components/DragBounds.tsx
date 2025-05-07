@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react";
 
-import { ContextNavigation } from "../contexts/ContextNavigation";
+import { ContextGame } from "../contexts/ContextGame";
 
 import { getPositionFromCoords } from "../utils/Utils";
 
@@ -13,7 +13,7 @@ type DragBoundsProps = {
 };
 
 export default function DragBounds({ isDragging, startPosition, currentPosition }: DragBoundsProps) {
-    const { scroll, letterRuntimes, setSelectedLetterIds } = useContext(ContextNavigation);
+    const { scroll, letterRuntimes, setSelectedLetterIds } = useContext(ContextGame);
 
     const width = Math.abs(currentPosition.x - startPosition.x);
     const height = Math.abs(currentPosition.y - startPosition.y);

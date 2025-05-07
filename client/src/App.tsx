@@ -1,6 +1,6 @@
 import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom'
 
-import { ContextNavigationProvider } from "./contexts/ContextNavigation";
+import { ContextGameProvider } from "./contexts/ContextGame";
 
 import About from './pages/About'
 import Game from './pages/Game'
@@ -14,13 +14,13 @@ export default function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/play/" element={<Navigate to="/play/LetterGrams" replace />} />
                 <Route path="/play/:letters" element={
-                    <ContextNavigationProvider>
+                    <ContextGameProvider>
                         <Game />
-                    </ContextNavigationProvider>} />
+                    </ContextGameProvider>} />
                 <Route path="/daily" element={
-                    <ContextNavigationProvider>
+                    <ContextGameProvider>
                         <Game isDailyGame={true} />
-                    </ContextNavigationProvider>} />
+                    </ContextGameProvider>} />
                 <Route path="/about" element={<About />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>

@@ -6,12 +6,12 @@ import Letter from "../components/Letter";
 
 import { GRID_SIZE } from "../constants/Constants";
 
-import { ContextNavigation } from "../contexts/ContextNavigation";
+import { ContextGame } from "../contexts/ContextGame";
 
 import { getPositionFromCoords, getScreenPositionFromShelf, getShelvedLetterCount } from "../utils/Utils";
 
 export default function GameLetter({ id }: { id: string }) {
-    const { scroll, isDraggingLetters, setIsDraggingLetters, isTypingFromShelf, letterRuntimes, setLetterRuntimes, selectedLetterIds, setSelectedLetterIds, windowDimensions } = useContext(ContextNavigation);
+    const { scroll, isDraggingLetters, setIsDraggingLetters, isTypingFromShelf, letterRuntimes, setLetterRuntimes, selectedLetterIds, setSelectedLetterIds, windowDimensions } = useContext(ContextGame);
 
     const runtime = letterRuntimes.find((letter) => letter.id === id);
     const letter = runtime?.letter || '';

@@ -1,11 +1,11 @@
 import { useContext } from "react";
 import { FaLocationArrow } from "react-icons/fa";
-import { ContextNavigation } from "../contexts/ContextNavigation";
+import { ContextGame } from "../contexts/ContextGame";
 import { LetterRuntime } from "../types/LetterRuntime";
 import { GRID_SIZE } from "../constants/Constants";
 
 export default function OffScreenPointer({ runtime }: { runtime: LetterRuntime }) {
-    const { scroll, windowDimensions, selectedLetterIds, isDraggingLetters } = useContext(ContextNavigation);
+    const { scroll, windowDimensions, selectedLetterIds, isDraggingLetters } = useContext(ContextGame);
 
     const buffer = 12;
     const dimension = 15;

@@ -4,14 +4,14 @@ import { Checkbox, Dialog, DialogPanel, DialogTitle, Field, Input, Label } from 
 
 import { IoMdClose } from "react-icons/io";
 
-import { ContextNavigation } from "../contexts/ContextNavigation";
+import { ContextGame } from "../contexts/ContextGame";
 
 import { DialogBox } from "../types/DialogBox"
 
 export default function DialogExitGame() {
     const [sharePositions, setSharePositions] = useState(true);
     const [hasCopied, setHasCopied] = useState(false);
-    const { dialogBox, setDialogBox, letterRuntimes } = useContext(ContextNavigation);
+    const { dialogBox, setDialogBox, letterRuntimes } = useContext(ContextGame);
     const urlInputRef = useRef<HTMLInputElement | null>(null);
     const location = useLocation();
     const isOpen = dialogBox === DialogBox.ShareGame;

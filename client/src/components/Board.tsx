@@ -2,12 +2,12 @@ import { useContext, useEffect, useState } from 'react';
 
 import DragBounds from './DragBounds';
 
-import { ContextNavigation } from '../contexts/ContextNavigation';
+import { ContextGame } from '../contexts/ContextGame';
 
 import { GRID_BOUNDS, GRID_SIZE } from '../constants/Constants';
 
 export default function Board() {
-    const { windowDimensions, setLetterRuntimes, scroll, setScroll, isTypingFromShelf, selectedLetterIds, isDraggingLetters } = useContext(ContextNavigation);
+    const { windowDimensions, setLetterRuntimes, scroll, setScroll, isTypingFromShelf, selectedLetterIds, isDraggingLetters } = useContext(ContextGame);
 
     const [isMouseDown, setIsMouseDown] = useState(false);
     const [startPosition, setStartPosition] = useState({ x: -1, y: -1 });

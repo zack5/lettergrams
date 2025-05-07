@@ -2,14 +2,14 @@ import { useContext } from "react";
 import { IoMdExit } from "react-icons/io";
 import { IoMdShare } from "react-icons/io";
 
-import { ContextNavigation } from "../contexts/ContextNavigation";
+import { ContextGame } from "../contexts/ContextGame";
 
 import { DialogBox } from "../types/DialogBox"
 
 import CollapsiblePanel from "./CollapsiblePanel"
 
 export default function LogoInGame() {
-    const { setDialogBox } = useContext(ContextNavigation);
+    const { setDialogBox } = useContext(ContextGame);
 
     return (
         <CollapsiblePanel name="Menu" corner="bottom-left">
