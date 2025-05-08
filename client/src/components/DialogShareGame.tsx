@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Checkbox, Dialog, DialogPanel, DialogTitle, Field, Input, Label } from '@headlessui/react'
 
-import { IoMdClose } from "react-icons/io";
+import DialogCloseButton from "./DialogCloseButton";
 
 import { ContextGame } from "../contexts/ContextGame";
 
@@ -52,13 +52,7 @@ export default function DialogExitGame() {
         >
             <div className="dialog-backdrop">
                 <DialogPanel className="dialog-panel">
-                    <button
-                        onClick={handleClose}
-                        className="close-button"
-                        aria-label="Close popup"
-                    >
-                        <IoMdClose />
-                    </button>
+                    <DialogCloseButton handleClose={handleClose}/>
                     <DialogTitle className="dialog-title">Share</DialogTitle>
 
                     <form className="share-form">

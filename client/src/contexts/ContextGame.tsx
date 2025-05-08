@@ -52,6 +52,8 @@ export const ContextGame = createContext<{
 
 export function ContextGameProvider({ children }: { children: React.ReactNode }) {
     const [scroll, setScroll] = useState<Position>({ x: 0, y: 0 });
+    const [inWinningBoardState, setInWinningBoardState] = useState<boolean>(false);
+    const [hasSeenCongratulations, setHasSeenCongratulations] = useState<boolean>(false);
     const [isDraggingLetters, setIsDraggingLetters] = useState<boolean>(false);
     const [isTypingFromShelf, setIsTypingFromShelf] = useState<boolean>(false);
     const [hoveredShelfSlot, setHoveredShelfSlot] = useState<number | null>(null);
@@ -569,7 +571,11 @@ export function ContextGameProvider({ children }: { children: React.ReactNode })
         return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
     }, [isDraggingLetters, selectedLetterIds, isTypingFromShelf, hoveredShelfSlot]);
 
-    useWordValidator(isDraggingLetters, letterRuntimes, selectedLetterIds, setValidWords);
+    useWordValidator(isDraggingLetters, letterRuntimes, selectedLetterIds, setValidWords, setInWinningBoardState);
+    if (inWinningBoardState && !hasSeenCongratulations) {
+        setHasSeenCongratulations(true);
+        setDialogBox(DialogBox.YouWon);
+    }
 
     return (
         <ContextGame.Provider value={{

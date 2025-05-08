@@ -6,6 +6,7 @@ import Board from "../components/Board";
 import Controls from "../components/Controls";
 import DialogExitGame from "../components/DialogExitGame";
 import DialogShareGame from "../components/DialogShareGame";
+import DialogYouWon from "../components/DialogYouWon";
 import GameLetter from "../components/GameLetter";
 import GameLetterShelf from "../components/GameLetterShelf";
 import LogoInGame from "../components/LogoInGame";
@@ -136,6 +137,7 @@ export default function Game({ letters: propLetters, isDailyGame }: { letters?: 
             <LogoInGame />
             <DialogExitGame />
             <DialogShareGame />
+            <DialogYouWon />
         </main>
     );
 }

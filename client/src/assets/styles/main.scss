@@ -150,6 +150,13 @@ input.custom-input[data-focus]:focus {
   gap: 0.5rem;
 }
 
+.inline-icon-text {
+  display: flex;
+  flex-direction: horizontal;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 .not-selectable {
   -webkit-touch-callout: none;
   -webkit-user-select: none;

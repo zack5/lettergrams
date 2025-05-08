@@ -42,6 +42,16 @@
     gap: 1rem;
 }
 
+.emoji-grid {
+    font-family: monospace;
+    white-space: pre;
+    text-align: center;
+    margin: 0;
+    padding: 1rem;
+    background-color: rgba(variables.$color-background-1, 0.8);
+    border-radius: 8px;
+}
+
 .close-button {
     position: absolute;
     top: 0.5rem;
