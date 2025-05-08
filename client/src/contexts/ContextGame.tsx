@@ -3,6 +3,9 @@ import { isEqual } from 'lodash';
 
 import { GRID_BOUNDS, GRID_SIZE, UNDO_LIMIT } from '../constants/Constants';
 
+import { useWordValidator } from '../hooks/useWordValidator';
+
+import { FoundWord } from '../types/FoundWord';
 import { LetterRuntime } from '../types/LetterRuntime';
 import { DialogBox } from '../types/DialogBox';
 import { Position } from '../types/Vector2';
@@ -22,6 +25,8 @@ export const ContextGame = createContext<{
     setLetterRuntimes: (letterRuntimes: LetterRuntime[] | ((prev: LetterRuntime[]) => LetterRuntime[])) => void;
     selectedLetterIds: string[];
     setSelectedLetterIds: (selectedLetterIds: string[] | ((prev: string[]) => string[])) => void;
+    validWords: Set<FoundWord>;
+    setValidWords: (validWords: Set<FoundWord> | ((prev: Set<FoundWord>) => Set<FoundWord>)) => void;
     dialogBox: DialogBox;
     setDialogBox: (dialogBox: DialogBox | ((prev: DialogBox) => DialogBox)) => void;
     windowDimensions: { width: number, height: number }
@@ -38,6 +43,8 @@ export const ContextGame = createContext<{
     setLetterRuntimes: () => { },
     selectedLetterIds: [],
     setSelectedLetterIds: () => { },
+    validWords: new Set(),
+    setValidWords: () => { },
     dialogBox: null,
     setDialogBox: () => { },
     windowDimensions: { width: 0, height: 0 },
@@ -50,6 +57,7 @@ export function ContextGameProvider({ children }: { children: React.ReactNode })
     const [hoveredShelfSlot, setHoveredShelfSlot] = useState<number | null>(null);
     const [letterRuntimes, setLetterRuntimes] = useState<LetterRuntime[]>([]);
     const [selectedLetterIds, setSelectedLetterIds] = useState<string[]>([]);
+    const [validWords, setValidWords] = useState<Set<FoundWord>>(new Set());
     const [dialogBox, setDialogBox] = useState<DialogBox>(null);
     const [mousePosition, setMousePosition] = useState<Position>({ x: window.innerWidth/2, y: window.innerHeight/2 });
     const [stacks, setStacks] = useState<{
@@ -561,6 +569,8 @@ export function ContextGameProvider({ children }: { children: React.ReactNode })
         return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
     }, [isDraggingLetters, selectedLetterIds, isTypingFromShelf, hoveredShelfSlot]);
 
+    useWordValidator(isDraggingLetters, letterRuntimes, selectedLetterIds, setValidWords);
+
     return (
         <ContextGame.Provider value={{
             scroll,
@@ -575,6 +585,8 @@ export function ContextGameProvider({ children }: { children: React.ReactNode })
             setLetterRuntimes,
             selectedLetterIds,
             setSelectedLetterIds,
+            validWords,
+            setValidWords,
             dialogBox,
             setDialogBox,
             windowDimensions,

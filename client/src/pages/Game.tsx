@@ -1,5 +1,6 @@
-import { useParams, useSearchParams } from "react-router-dom";
 import { useContext, useEffect } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
+import { AnimatePresence } from "motion/react";
 
 import Board from "../components/Board";
 import Controls from "../components/Controls";
@@ -14,6 +15,7 @@ import { ContextGame } from "../contexts/ContextGame";
 import { LetterRuntime } from "../types/LetterRuntime";
 import { getPositionFromCoords, getScreenPositionFromShelf, getDailyLetters } from "../utils/Utils";
 import { GRID_SIZE } from "../constants/Constants";
+import ValidWordIndicator from "../components/VaidWordIndicator";
 
 export default function Game({ letters: propLetters, isDailyGame }: { letters?: string, isDailyGame?: boolean }) {
     function filterAlphaOnly(input: string): string {
@@ -26,7 +28,7 @@ export default function Game({ letters: propLetters, isDailyGame }: { letters?: 
     const [searchParams, _] = useSearchParams();
     const setup = searchParams.get('setup')
 
-    const { letterRuntimes, setLetterRuntimes, setScroll, windowDimensions } = useContext(ContextGame);
+    const { letterRuntimes, setLetterRuntimes, setScroll, validWords, windowDimensions } = useContext(ContextGame);
 
     useEffect(() => {
         
@@ -117,10 +119,17 @@ export default function Game({ letters: propLetters, isDailyGame }: { letters?: 
         <OffScreenPointer runtime={runtime} key={index}/>
     ));
 
+    const validWordsElements = Array.from(validWords).map((wordData, _) => (
+        <ValidWordIndicator wordData={wordData} key={`${wordData.word}-${wordData.startRow}-${wordData.startCol}`}/>
+    ));
+
     return (
         <main className="game">
             <Board />
             {offScreenPointers}
+            <AnimatePresence>
+                {validWordsElements}
+            </AnimatePresence>
             {letterElements}
             <GameLetterShelf />
             <Controls />
