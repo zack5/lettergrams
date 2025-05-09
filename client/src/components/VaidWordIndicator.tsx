@@ -17,7 +17,7 @@ export default function ValidWordIndicator({ wordData }: { wordData: FoundWord }
 
     // Initial border width for animation
     const initialBorderWidth = 0;
-    const finalBorderWidth = 6;
+    const finalBorderWidth = 9;
 
     // Adjust position to account for border growth
     const top = startPosition.y + scroll.y - initialBorderWidth;
