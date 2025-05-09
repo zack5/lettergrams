@@ -69,7 +69,7 @@ export default function DialogYouWon() {
                                 <Description className="dialog-description">
                                     {description}
                                 </Description>
-                                <ShareButtons />
+                                <ShareButtons isDailyGame={true} />
                             </DialogPanel>
                         </motion.div>
                     </motion.div>

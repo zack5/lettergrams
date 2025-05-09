@@ -8,7 +8,7 @@ import { ContextGame } from "../contexts/ContextGame";
 
 import { DialogBox } from "../types/DialogBox"
 
-export default function DialogExitGame() {
+export default function DialogExitGame({ isDailyGame }: { isDailyGame: boolean }) {
     const { dialogBox, setDialogBox } = useContext(ContextGame);
     const isOpen = dialogBox === DialogBox.ShareGame;
 
@@ -26,7 +26,7 @@ export default function DialogExitGame() {
                 <DialogPanel className="dialog-panel">
                     <DialogCloseButton handleClose={handleClose}/>
                     <DialogTitle className="dialog-title">Share</DialogTitle>
-                    <ShareButtons />
+                    <ShareButtons isDailyGame={isDailyGame} />
                 </DialogPanel>
             </div>
         </Dialog>

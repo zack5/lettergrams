@@ -10,8 +10,8 @@ export default function About() {
             <LetterHeader text="About" />
             <h2>LetterGrams</h2>
             <p>
-                This is a simple playground for manipulating letter tiles.
-                Share with your friends to compete to see who can form a valid scrabble grid the fastest!
+                Use all given letters to form words that connect. Words must have at least three letters.
+                Come back daily to play a new puzzle!
             </p>
             <h2>Contact</h2>
             <a href="mailto:isaac.cinquini@gmail.com">

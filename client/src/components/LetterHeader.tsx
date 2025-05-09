@@ -3,9 +3,9 @@ import Letter from "./Letter";
 
 export default function LetterHeader({ text }: { text: string }) {
     const backgroundWidth = Math.max(text.length, 12) * GRID_SIZE
-    const backgroundSize = `${backgroundWidth}px ${GRID_SIZE * 2}px`
+    const backgroundSize = `${backgroundWidth}px ${GRID_SIZE * 3}px`
     const elems = text.toUpperCase().split('').map((letter, index) => {
-        const backgroundPosition = `-${GRID_SIZE * index}px 0px`
+        const backgroundPosition = `-${GRID_SIZE * index}px ${GRID_SIZE * 2}px`
         return (
             <Letter
                 key={index}

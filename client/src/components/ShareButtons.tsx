@@ -11,9 +11,9 @@ const CurrentlyCopied = {
 } as const;
 type CurrentlyCopied = (typeof CurrentlyCopied)[keyof typeof CurrentlyCopied] | null;
 
-export default function ShareButtons() {
+export default function ShareButtons({ isDailyGame }: { isDailyGame: boolean }) {
     const { letterRuntimes, inWinningBoardState } = useContext(ContextGame);
-    const [sharePositions, setSharePositions] = useState(true);
+    const [sharePositions, setSharePositions] = useState(false);
     const [currentlyCopied, setCurrentlyCopied] = useState<CurrentlyCopied>(null);
     const urlInputRef = useRef<HTMLInputElement | null>(null);
     const location = useLocation();
@@ -95,7 +95,7 @@ export default function ShareButtons() {
 
     return (
         <>
-            {inWinningBoardState && <>
+            {inWinningBoardState && isDailyGame && <>
                 <form className="share-form">
                     <Field className="field-horizontal">
                         <Label className="visually-hidden">URL:</Label>

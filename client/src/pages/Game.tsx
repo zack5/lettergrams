@@ -136,8 +136,8 @@ export default function Game({ letters: propLetters, isDailyGame }: { letters?: 
             <Controls />
             <LogoInGame />
             <DialogExitGame />
-            <DialogShareGame />
-            <DialogYouWon />
+            <DialogShareGame isDailyGame={isDailyGame || false} />
+            {isDailyGame && <DialogYouWon />}
         </main>
     );
 }
