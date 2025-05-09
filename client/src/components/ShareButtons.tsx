@@ -112,7 +112,7 @@ export default function ShareButtons({ isDailyGame }: { isDailyGame: boolean }) 
                         </div>
                     </Field>
                 </form>
-                <hr className="divider-small" />
+                <hr className="divider" />
             </>}
 
             <form className="share-form">

@@ -43,6 +43,9 @@ export default function Home() {
                 <div className="mobile-only">
                     <b>Warning:</b> LetterGrams is not yet optimized for mobile!
                 </div>
+                <div>
+                    Use given letters to form words that connect. Words must be at least three letters long.
+                </div>
                 <form onSubmit={handleSubmitDailyGame} aria-labelledby="playDailyFormTitle">
                     <h2 id="playDailyFormTitle" className="visually-hidden">Enter letters to play with:</h2>
                     <button
