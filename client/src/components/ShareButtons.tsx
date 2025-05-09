@@ -43,7 +43,10 @@ export default function ShareButtons({ isDailyGame }: { isDailyGame: boolean }) 
         });
 
         const today = new Date();
-        const formattedDate = today.toISOString().split('T')[0];
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
         result.push(`LetterGrams\n${formattedDate}`);
 
         // Generate the emoji grid

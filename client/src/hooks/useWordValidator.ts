@@ -66,13 +66,13 @@ export const useWordValidator = (
             return word.join('').toLowerCase();
         }
 
+        const getPositionKey = (row: number, col: number): string => `${row},${col}`;
+
         const validWords: Set<FoundWord> = new Set();
         let allWordsValid = true;
         for (const [key, _] of lettersAtPositions.entries()) {
             const [row, col] = key.split(',').map(Number);
             const position = { row, col };
-
-            const getPositionKey = (row: number, col: number): string => `${row},${col}`;
 
             const leftLetter = lettersAtPositions.get(getPositionKey(row, col - 1));
             const rightLetter = lettersAtPositions.get(getPositionKey(row, col + 1));
@@ -121,7 +121,51 @@ export const useWordValidator = (
             }
         }
 
-        const hasWon = allLettersOnBoard && allWordsValid && validWords.size > 0;
+        let hasWon = allLettersOnBoard && allWordsValid && validWords.size > 0;
+
+        if (hasWon) {
+            // Check if all letters are connected in a single component using BFS
+            const visited = new Set<string>();
+            const queue: [number, number][] = [];
+            
+            // Start BFS from the first letter on the board
+            let startPosition: [number, number] | null = null;
+            for (const [key, _] of lettersAtPositions.entries()) {
+                const [row, col] = key.split(',').map(Number);
+                startPosition = [row, col];
+                break;
+            }
+            
+            if (startPosition) {
+                queue.push(startPosition);
+                visited.add(getPositionKey(startPosition[0], startPosition[1]));
+                
+                while (queue.length > 0) {
+                    const [row, col] = queue.shift()!;
+                    
+                    // Check all four adjacent positions
+                    const adjacentPositions = [
+                        [row - 1, col], // up
+                        [row + 1, col], // down
+                        [row, col - 1], // left
+                        [row, col + 1]  // right
+                    ];
+                    
+                    for (const [adjRow, adjCol] of adjacentPositions) {
+                        const posKey = getPositionKey(adjRow, adjCol);
+                        if (lettersAtPositions.has(posKey) && !visited.has(posKey)) {
+                            visited.add(posKey);
+                            queue.push([adjRow, adjCol]);
+                        }
+                    }
+                }
+                
+                // If we didn't visit all positions, the letters aren't fully connected
+                if (visited.size !== lettersAtPositions.size) {
+                    hasWon = false;
+                }
+            }
+        }
 
         return { validWords, hasWon };
     };
