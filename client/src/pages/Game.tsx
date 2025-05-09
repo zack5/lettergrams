@@ -32,6 +32,18 @@ export default function Game({ letters: propLetters, isDailyGame }: { letters?: 
     const { letterRuntimes, setLetterRuntimes, setScroll, validWords, windowDimensions } = useContext(ContextGame);
 
     useEffect(() => {
+        // Add game-active class to html and body when component mounts
+        document.documentElement.classList.add('game-active');
+        document.body.classList.add('game-active');
+        
+        // Remove game-active class when component unmounts
+        return () => {
+            document.documentElement.classList.remove('game-active');
+            document.body.classList.remove('game-active');
+        };
+    }, []);
+
+    useEffect(() => {
         
         interface GridSpace {
             row: number;

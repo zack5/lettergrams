@@ -12,6 +12,8 @@
 }
 
 .document-page-contents {
-    min-height: calc(100vh - 2 * variables.$content-margins);
-    padding: variables.$content-margins;
-  }
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    @include variables.responsive-content-margins;
+}

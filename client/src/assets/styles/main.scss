@@ -31,7 +31,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  min-width: 100vh;
+  min-width: 100vw;
   min-height: 100vh;
 }
 
@@ -49,8 +49,13 @@ a:hover {
 body,
 html {
   margin: 0;
-  overflow: hidden;
+  overflow-x: hidden;
   height: 100%;
+}
+
+html.game-active,
+body.game-active {
+  overflow-y: hidden;
 }
 
 h1 {

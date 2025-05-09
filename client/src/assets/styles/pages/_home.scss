@@ -1,10 +1,10 @@
 @use "../base/variables";
 
-.page-container {
+
+main.home-page-main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: calc(100vh - variables.$footer-height - 2 * variables.$content-margins);
     gap: 1.5rem;
 }
 
@@ -28,10 +28,15 @@ footer {
     gap: 1rem;
     width: 100%;
     height: variables.$footer-height;
+    margin-top: 2rem;
 }
 
 .animating-letters {
-    margin-block: 1.5rem;
+    margin-block: 1rem;
+    
+    @media (max-width: variables.$breakpoint-mobile) {
+        margin-block: 0;
+    }
 }
 
 .letters-input-field {

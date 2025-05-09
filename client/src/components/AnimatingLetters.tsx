@@ -4,17 +4,31 @@ import { ANIMATIONS, LETTER_SIZE, WIDTH, HEIGHT, DELAY } from "../constants/Anim
 
 export default function AnimatingLetters() {
     const [frame, setFrame] = useState(0);
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    
     useEffect(() => {
         const interval = setInterval(() => {
             setFrame(prev => (prev + 1) % ANIMATIONS.length);
         }, DELAY);
-        return () => clearInterval(interval);
+        
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+        };
+        
+        window.addEventListener('resize', handleResize);
+        
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener('resize', handleResize);
+        };
     }, []);
 
     const backgroundSize = {
         width: WIDTH * LETTER_SIZE,
         height: HEIGHT * LETTER_SIZE,
     }
+
+    const scale = Math.min((windowWidth - 48) / backgroundSize.width, 1);
 
     const offset = ANIMATIONS[frame].offset || { x: 0, y: 0 };
     const letterElements = ANIMATIONS[frame].letters
@@ -31,7 +45,13 @@ export default function AnimatingLetters() {
 
     return (
         <>
-            <div className="animating-letters" style={{ position: 'relative', width: backgroundSize.width, height: backgroundSize.height }}>
+            <div className="animating-letters" style={{ 
+                position: 'relative', 
+                width: backgroundSize.width, 
+                height: backgroundSize.height,
+                transform: `scale(${scale})`,
+                transformOrigin: 'center center'
+            }}>
                 {letterElements}
             </div>
         </>

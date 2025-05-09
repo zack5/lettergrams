@@ -10,10 +10,30 @@ $color-text-2: rgba(255, 255, 255, 0.7);
 $color-text-accent: #96c9ff;
 $color-link: #a4a4a4;
 
-$content-margins: 40px;
+$breakpoint-mobile: 768px;
+
+// Content margins
+$content-margins-desktop: 40px;
+$content-margins-mobile: 24px;
+$content-margins: $content-margins-desktop;
+
+// Mixin for responsive content margins
+@mixin responsive-content-margins {
+  @media (max-width: $breakpoint-mobile) {
+    padding: $content-margins-mobile;
+    min-height: calc(100vh - 2 * #{$content-margins-mobile});
+  }
+  @media (min-width: #{$breakpoint-mobile + 1px}) {
+    padding: $content-margins-desktop;
+    min-height: calc(100vh - 2 * #{$content-margins-desktop});
+  }
+}
 
 $footer-height: 40px;
 
 $z-index-shelf: 100;
 $z-index-in-game-panel: 200;
 $z-index-popup: 300;
+
+
+

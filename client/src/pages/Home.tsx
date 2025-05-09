@@ -38,66 +38,67 @@ export default function Home() {
 
     return (
         <DocumentPage>
-            <div className="page-container">
-                <AnimatingLetters />
-                <div className="mobile-only">
-                    <b>Warning:</b> LetterGrams is not yet optimized for mobile!
-                </div>
-                <div>
-                    Use given letters to form words that connect. Words must be at least three letters long.
-                </div>
-                <form onSubmit={handleSubmitDailyGame} aria-labelledby="playDailyFormTitle">
-                    <h2 id="playDailyFormTitle" className="visually-hidden">Enter letters to play with:</h2>
-                    <button
-                        type="submit"
-                        aria-label="Play Daily Game"
-                    >
-                        Play Daily Game!
-                    </button>
-                </form>
-                <hr className="divider" />
-                <form onSubmit={handleSubmitCustomGame} aria-labelledby="lettersFormTitle">
-                    <h2 id="lettersFormTitle" className="visually-hidden">Enter letters to play with:</h2>
-                    <Field className="letters-input-field">
-                        <Label className="visually-hidden">Letters:</Label>
-                        <Input
-                            className="custom-input"
-                            ref={lettersInputRef}
-                            type="text"
-                            name="lettersInput"
-                            placeholder="Enter letters"
-                            value={letters}
-                            maxLength={30}
-                            onChange={(event) => setLetters(event.target.value)}
-                            required
-                            aria-required="true"
-                        />
-                        <button
-                            type="button"
-                            aria-label="Random letters"
-                            onClick={() => setLetters(getRandomLetters())}
-                            style={{
-                                padding: '0rem',
-                                height: '2.2rem',
-                                width: '2.2rem',
-                                backgroundColor: 'transparent',
-                            }}
-                        >
-                            <GiPerspectiveDiceSixFacesRandom style={{ fontSize: '2rem' }} />
-                        </button>
-                    </Field>
+                <main className="home-page-main">
 
-                    <button
-                        type="submit"
-                        aria-label="Play Custom Game"
-                    >
-                        Play Custom Game!
-                    </button>
-                </form>
-            </div>
-            <footer>
-                <Link to="/about">About</Link>
-            </footer>
+                    <AnimatingLetters />
+                    <div className="mobile-only">
+                        <b>Warning:</b> LetterGrams is not yet optimized for mobile!
+                    </div>
+                    <div>
+                        Form words that connect with the given letters. Words must be at least three letters long.
+                    </div>
+                    <form onSubmit={handleSubmitDailyGame} aria-labelledby="playDailyFormTitle">
+                        <h2 id="playDailyFormTitle" className="visually-hidden">Enter letters to play with:</h2>
+                        <button
+                            type="submit"
+                            aria-label="Play Daily Game"
+                        >
+                            Play Daily Game!
+                        </button>
+                    </form>
+                    <hr className="divider" />
+                    <form onSubmit={handleSubmitCustomGame} aria-labelledby="lettersFormTitle">
+                        <h2 id="lettersFormTitle" className="visually-hidden">Enter letters to play with:</h2>
+                        <Field className="letters-input-field">
+                            <Label className="visually-hidden">Letters:</Label>
+                            <Input
+                                className="custom-input"
+                                ref={lettersInputRef}
+                                type="text"
+                                name="lettersInput"
+                                placeholder="Enter letters"
+                                value={letters}
+                                maxLength={30}
+                                onChange={(event) => setLetters(event.target.value)}
+                                required
+                                aria-required="true"
+                            />
+                            <button
+                                type="button"
+                                aria-label="Random letters"
+                                onClick={() => setLetters(getRandomLetters())}
+                                style={{
+                                    padding: '0rem',
+                                    height: '2.2rem',
+                                    width: '2.2rem',
+                                    backgroundColor: 'transparent',
+                                }}
+                            >
+                                <GiPerspectiveDiceSixFacesRandom style={{ fontSize: '2rem' }} />
+                            </button>
+                        </Field>
+
+                        <button
+                            type="submit"
+                            aria-label="Play Custom Game"
+                        >
+                            Play Custom Game!
+                        </button>
+                    </form>
+                </main>
+                <footer>
+                    <Link to="/about">About</Link>
+                </footer>
         </DocumentPage>
     )
 }
