@@ -75,15 +75,21 @@ export const useWordValidator = (
 
             const getPositionKey = (row: number, col: number): string => `${row},${col}`;
 
-            const leftKey = getPositionKey(row, col - 1);
-            const rightKey = getPositionKey(row, col + 1);
-            const upKey = getPositionKey(row - 1, col);
-            const downKey = getPositionKey(row + 1, col);
+            const leftLetter = lettersAtPositions.get(getPositionKey(row, col - 1));
+            const rightLetter = lettersAtPositions.get(getPositionKey(row, col + 1));
+            const upLetter = lettersAtPositions.get(getPositionKey(row - 1, col));
+            const downLetter = lettersAtPositions.get(getPositionKey(row + 1, col));
 
-            const startsHorizontal = lettersAtPositions.get(leftKey) === undefined
-                && lettersAtPositions.get(rightKey) !== undefined;
-            const startsVertical = lettersAtPositions.get(upKey) === undefined
-                && lettersAtPositions.get(downKey) !== undefined;
+            if (!leftLetter && !rightLetter && !upLetter && !downLetter) {
+                allWordsValid = false;
+                continue;
+            }
+
+            const startsHorizontal = leftLetter === undefined
+                && rightLetter !== undefined;
+            const startsVertical = upLetter === undefined
+                && downLetter !== undefined;
+
 
             if (startsHorizontal) {
                 const word = getWord(position, true);

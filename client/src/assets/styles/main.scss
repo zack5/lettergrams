@@ -157,6 +157,18 @@ input.custom-input[data-focus]:focus {
   align-items: center;
 }
 
+.divider {
+  width: 5rem;
+  margin-block: 2rem;
+  margin-inline: auto;
+}
+
+.divider-small {
+  width: 5rem;
+  margin-block: 0.5rem;
+  margin-inline: auto;
+}
+
 .not-selectable {
   -webkit-touch-callout: none;
   -webkit-user-select: none;

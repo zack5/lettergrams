@@ -27,6 +27,8 @@ export const ContextGame = createContext<{
     setSelectedLetterIds: (selectedLetterIds: string[] | ((prev: string[]) => string[])) => void;
     validWords: Set<FoundWord>;
     setValidWords: (validWords: Set<FoundWord> | ((prev: Set<FoundWord>) => Set<FoundWord>)) => void;
+    inWinningBoardState: boolean;
+    setInWinningBoardState: (inWinningBoardState: boolean | ((prev: boolean) => boolean)) => void;
     dialogBox: DialogBox;
     setDialogBox: (dialogBox: DialogBox | ((prev: DialogBox) => DialogBox)) => void;
     windowDimensions: { width: number, height: number }
@@ -45,6 +47,8 @@ export const ContextGame = createContext<{
     setSelectedLetterIds: () => { },
     validWords: new Set(),
     setValidWords: () => { },
+    inWinningBoardState: false,
+    setInWinningBoardState: () => { },
     dialogBox: null,
     setDialogBox: () => { },
     windowDimensions: { width: 0, height: 0 },
@@ -593,6 +597,8 @@ export function ContextGameProvider({ children }: { children: React.ReactNode })
             setSelectedLetterIds,
             validWords,
             setValidWords,
+            inWinningBoardState,
+            setInWinningBoardState,
             dialogBox,
             setDialogBox,
             windowDimensions,
