@@ -1,6 +1,7 @@
 import { GRID_SIZE, SHELF_BOTTOM_OFFSET, SHELF_PADDING, DICE } from "../constants/Constants";
 import { LetterRuntime } from "../types/LetterRuntime";
 import { Coordinate, Position, Size } from "../types/Vector2";
+import dailyOptions from '../assets/DailyOptions.json';
 
 export const getCoordsFromPosition = (
     position: { x: number, y: number }
@@ -62,9 +63,6 @@ export const getRandomLetters = (): string => {
 }
 
 export const getDailyLetters = (): string => {
-    const dailyOptions = [
-        'Daily',
-    ]
     
     const today = new Date();
     const daysSinceEpoch = Math.floor(today.getTime() / (1000 * 60 * 60 * 24));
