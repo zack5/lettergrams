@@ -44,7 +44,7 @@ export default function ShareButtons() {
 
         const today = new Date();
         const formattedDate = today.toISOString().split('T')[0];
-        result.push(`Lettergrams ${formattedDate}`);
+        result.push(`LetterGrams\n${formattedDate}`);
 
         // Generate the emoji grid
         for (let row = minRow; row <= maxRow; row++) {
@@ -54,7 +54,7 @@ export default function ShareButtons() {
                     letter => letter.row === row && letter.col === col
                 );
 
-                rowString += letterAtPosition ? "🟧" : "⬜";
+                rowString += letterAtPosition ? "🟩" : "⬜";
             }
             result.push(rowString);
         }

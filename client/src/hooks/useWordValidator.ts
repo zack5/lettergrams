@@ -45,8 +45,7 @@ export const useWordValidator = (
             if (!letterRuntime.isShelved && !letterRuntime.startedDragFromShelf && !(isDraggingLetters && selectedLetterIds.includes(letterRuntime.id))) {
                 const key = `${letterRuntime.row},${letterRuntime.col}`;
                 lettersAtPositions.set(key, { letter: letterRuntime.letter, id: letterRuntime.id });
-            }
-            if (letterRuntime.isShelved || letterRuntime.startedDragFromShelf) {
+            } else {
                 allLettersOnBoard = false;
             }
         }
